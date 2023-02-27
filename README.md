@@ -57,7 +57,7 @@ The official **documentation and manpage** for `apx` are available at <https://d
 
 > Please consider to keep the project name as `apx` to avoid confusion for users.
 
-To use with another distro, you can compile the distro and copy the files to the needed paths
+To use with another distro, you can compile the to distro using ``go`` and copy the files to the needed paths
 
 `/usr/lib/apx/distrobox*` for the distrbox binaries that apx expects.
 
