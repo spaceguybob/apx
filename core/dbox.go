@@ -4,7 +4,7 @@ package core
 	Authors:
 		Mirko Brombin <send@mirko.pm>
 		Vanilla OS Contributors <https://github.com/vanilla-os/>
-	Copyright: 2023
+	Copyright: 2024
 	Description:
 		Apx is a wrapper around multiple package managers to install packages and run commands inside a managed container.
 */
@@ -16,6 +16,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
+	"io/ioutil"
 )
 
 type dbox struct {
@@ -76,7 +78,7 @@ func dboxGetVersion() (version string, err error) {
 	return splitted[1], nil
 }
 
-func (d *dbox) RunCommand(command string, args []string, engineFlags []string, useEngine bool, captureOutput bool, muteOutput bool) ([]byte, error) {
+func (d *dbox) RunCommand(command string, args []string, engineFlags []string, useEngine bool, captureOutput bool, muteOutput bool, rootFull bool, detachedMode bool) ([]byte, error) {
 	entrypoint := apx.Cnf.DistroboxPath
 	if useEngine {
 		entrypoint = d.EngineBinary
@@ -86,7 +88,18 @@ func (d *dbox) RunCommand(command string, args []string, engineFlags []string, u
 	// ignored in commands like "enter"
 	finalArgs := []string{command}
 
+	// NOTE: for engine-specific commands, we need to use pkexec for rootfull
+	//		 containers, since podman does not offer a dedicated flag for this.
+	if rootFull && useEngine {
+		entrypoint = "pkexec"
+		finalArgs = []string{d.EngineBinary, command}
+	}
+
 	cmd := exec.Command(entrypoint, finalArgs...)
+
+	if detachedMode {
+		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	}
 
 	if !captureOutput && !muteOutput {
 		cmd.Stdout = os.Stdout
@@ -97,6 +110,7 @@ func (d *dbox) RunCommand(command string, args []string, engineFlags []string, u
 	cmd.Stdin = os.Stdin
 
 	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "DBX_SUDO_PROGRAM=pkexec")
 
 	// NOTE: the custom storage is not being used since it prevent other
 	//		 utilities, like VSCode, to access the container.
@@ -113,27 +127,52 @@ func (d *dbox) RunCommand(command string, args []string, engineFlags []string, u
 		cmd.Args = append(cmd.Args, strings.Join(engineFlags, " "))
 	}
 
+	// NOTE: the root flag is not being used by the Apx CLI, but it's useful
+	//		 for those using Apx as a library, e.g. VSO.
+	if rootFull && !useEngine {
+		cmd.Args = append(cmd.Args, "--root")
+	}
+
 	cmd.Args = append(cmd.Args, args...)
 
 	if os.Getenv("APX_VERBOSE") == "1" {
-		fmt.Println("running command:")
-		fmt.Println(cmd.String())
+		fmt.Println("Runing a command:")
+		fmt.Println("\tCommand:", cmd.String())
+		fmt.Println("\tcaptureOutput:", captureOutput)
+		fmt.Println("\tmuteOutput:", muteOutput)
+		fmt.Println("\trootFull:", rootFull)
+		fmt.Println("\tdetachedMode:", detachedMode)
+	}
+
+	if detachedMode {
+		err := cmd.Start()
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
 	}
 
 	if captureOutput {
 		output, err := cmd.Output()
+		if err != nil {
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				return output, errors.New(string(exitErr.Stderr))
+			}
+		}
 		return output, err
 	}
+
+	cmd.Stdout = ioutil.Discard
 
 	err := cmd.Run()
 	return nil, err
 }
 
-func (d *dbox) ListContainers() ([]dboxContainer, error) {
+func (d *dbox) ListContainers(rootFull bool) ([]dboxContainer, error) {
 	output, err := d.RunCommand("ps", []string{
 		"-a",
 		"--format", "{{.ID}}|{{.CreatedAt}}|{{.Status}}|{{.Labels}}|{{.Names}}",
-	}, []string{}, true, true, false)
+	}, []string{}, true, true, false, rootFull, false)
 	if err != nil {
 		return nil, err
 	}
@@ -178,8 +217,8 @@ func (d *dbox) ListContainers() ([]dboxContainer, error) {
 	return containers, nil
 }
 
-func (d *dbox) GetContainer(name string) (*dboxContainer, error) {
-	containers, err := d.ListContainers()
+func (d *dbox) GetContainer(name string, rootFull bool) (*dboxContainer, error) {
+	containers, err := d.ListContainers(rootFull)
 	if err != nil {
 		return nil, err
 	}
@@ -194,28 +233,41 @@ func (d *dbox) GetContainer(name string) (*dboxContainer, error) {
 	return nil, errors.New("container not found")
 }
 
-func (d *dbox) ContainerDelete(name string) error {
+func (d *dbox) ContainerDelete(name string, rootFull bool) error {
 	_, err := d.RunCommand("rm", []string{
 		"--force",
 		name,
-	}, []string{}, false, false, true)
+	}, []string{}, false, false, true, rootFull, false)
 	return err
 }
 
-func (d *dbox) CreateContainer(name string, image string, additionalPackages []string, labels map[string]string, withInit bool) error {
+func (d *dbox) CreateContainer(name string, image string, additionalPackages []string, home string, labels map[string]string, withInit bool, rootFull bool, unshared bool, withNvidiaIntegration bool, hostname string) error {
 	args := []string{
 		"--image", image,
 		"--name", name,
 		"--no-entry",
 		"--yes",
+		"--pull",
 	}
 
-	if hasNvidiaGPU() {
+	if home != "" {
+		args = append(args, "--home", home)
+	}
+
+	if hasNvidiaGPU() && withNvidiaIntegration {
 		args = append(args, "--nvidia")
 	}
 
 	if withInit {
 		args = append(args, "--init")
+	}
+
+	if unshared {
+		args = append(args, "--unshare-all")
+	}
+
+	if hostname != "" {
+		args = append(args, "--hostname", hostname)
 	}
 
 	if len(additionalPackages) > 0 {
@@ -229,12 +281,12 @@ func (d *dbox) CreateContainer(name string, image string, additionalPackages []s
 	}
 	engineFlags = append(engineFlags, "--label=manager=apx")
 
-	_, err := d.RunCommand("create", args, engineFlags, false, true, true)
+	_, err := d.RunCommand("create", args, engineFlags, false, false, false, rootFull, false)
 	// fmt.Println(string(out))
 	return err
 }
 
-func (d *dbox) RunContainerCommand(name string, command []string) error {
+func (d *dbox) RunContainerCommand(name string, command []string, rootFull, detachedMode bool) error {
 	args := []string{
 		"--name", name,
 		"--",
@@ -242,11 +294,11 @@ func (d *dbox) RunContainerCommand(name string, command []string) error {
 
 	args = append(args, command...)
 
-	_, err := d.RunCommand("run", args, []string{}, false, false, false)
+	_, err := d.RunCommand("run", args, []string{}, false, false, false, rootFull, detachedMode)
 	return err
 }
 
-func (d *dbox) ContainerExec(name string, captureOutput bool, muteOutput bool, args ...string) (string, error) {
+func (d *dbox) ContainerExec(name string, captureOutput bool, muteOutput bool, rootFull, detachedMode bool, args ...string) (string, error) {
 	finalArgs := []string{
 		// "--verbose",
 		name,
@@ -256,22 +308,51 @@ func (d *dbox) ContainerExec(name string, captureOutput bool, muteOutput bool, a
 	finalArgs = append(finalArgs, args...)
 	engineFlags := []string{}
 
-	out, err := d.RunCommand("enter", finalArgs, engineFlags, false, captureOutput, muteOutput)
+	out, err := d.RunCommand("enter", finalArgs, engineFlags, false, captureOutput, muteOutput, rootFull, detachedMode)
+	// if error 130, it means that the user pressed CTRL+D, so ignore
+	if err != nil && err.Error() == "exit status 130" {
+		return string(out), nil
+	}
+
 	return string(out), err
 }
 
-func (d *dbox) ContainerEnter(name string) error {
+func (d *dbox) ContainerEnter(name string, rootFull bool) error {
 	finalArgs := []string{
 		name,
 	}
 
 	engineFlags := []string{}
 
-	_, err := d.RunCommand("enter", finalArgs, engineFlags, false, false, false)
+	_, err := d.RunCommand("enter", finalArgs, engineFlags, false, false, false, rootFull, false)
+	// if error 130, it means that the user pressed CTRL+D, so ignore
+	if err != nil && err.Error() == "exit status 130" {
+		return nil
+	}
+
 	return err
 }
 
-func (d *dbox) ContainerExport(name string, delete bool, args ...string) error {
+func (d *dbox) ContainerStart(name string, rootFull bool) error {
+	_, err := d.RunCommand("start", []string{
+		name,
+	}, []string{}, true, false, false, rootFull, false)
+	return err
+}
+
+func (d *dbox) ContainerStop(name string, rootFull bool) error {
+	finalArgs := []string{
+		name,
+		"--yes",
+	}
+
+	engineFlags := []string{}
+
+	_, err := d.RunCommand("stop", finalArgs, engineFlags, false, false, false, rootFull, false)
+	return err
+}
+
+func (d *dbox) ContainerExport(name string, delete bool, rootFull bool, args ...string) error {
 	finalArgs := []string{"distrobox-export"}
 
 	if delete {
@@ -280,26 +361,26 @@ func (d *dbox) ContainerExport(name string, delete bool, args ...string) error {
 
 	finalArgs = append(finalArgs, args...)
 
-	_, err := d.ContainerExec(name, false, true, finalArgs...)
+	_, err := d.ContainerExec(name, true, true, rootFull, false, finalArgs...)
 	return err
 }
 
-func (d *dbox) ContainerExportDesktopEntry(containerName string, appName string, label string) error {
+func (d *dbox) ContainerExportDesktopEntry(containerName string, appName string, label string, rootFull bool) error {
 	args := []string{"--app", appName, "--export-label", label}
-	return d.ContainerExport(containerName, false, args...)
+	return d.ContainerExport(containerName, false, rootFull, args...)
 }
 
-func (d *dbox) ContainerUnexportDesktopEntry(containerName string, appName string) error {
+func (d *dbox) ContainerUnexportDesktopEntry(containerName string, appName string, rootFull bool) error {
 	args := []string{"--app", appName}
-	return d.ContainerExport(containerName, true, args...)
+	return d.ContainerExport(containerName, true, rootFull, args...)
 }
 
-func (d *dbox) ContainerExportBin(containerName string, binary string, exportPath string) error {
+func (d *dbox) ContainerExportBin(containerName string, binary string, exportPath string, rootFull bool) error {
 	args := []string{"--bin", binary, "--export-path", exportPath}
-	return d.ContainerExport(containerName, false, args...)
+	return d.ContainerExport(containerName, false, rootFull, args...)
 }
 
-func (d *dbox) ContainerUnexportBin(containerName string, binary string, exportPath string) error {
-	args := []string{"--bin", binary, "--export-path", exportPath}
-	return d.ContainerExport(containerName, true, args...)
+func (d *dbox) ContainerUnexportBin(containerName string, binary string, rootFull bool) error {
+	args := []string{"--bin", binary}
+	return d.ContainerExport(containerName, true, rootFull, args...)
 }

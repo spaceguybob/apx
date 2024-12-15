@@ -4,12 +4,25 @@ apx:
     unknownCommand: "未知的命令：%s"
     invalidInput: "输入无效。"
     invalidChoice: 选择无效。
+    noRoot: 请不要以 root 用户运行 Apx。
   info:
     aborting: "应用户要求取消操作。"
   terminal:
     yes: "是"
     no: "否"
 
+  msg:
+    examples: 示例
+    aliases: 别名
+    usage: 用法
+    moreInfo: 使用 %s 获取有关命令的更多信息
+    availableCommands: 可用命令
+    flags: 参数
+    additionalCommands: 附加命令
+    version: 显示 apx 的版本。
+    help: 显示 apx 的帮助。
+    globalFlags: 全局参数
+    additionalHelpTopics: 附加帮助主题
 runtimeCommand:
   description: "操作指定的子系统，访问软件包管理器及环境。"
   error:
@@ -22,6 +35,9 @@ runtimeCommand:
     exportingBin: "导出二进制文件时发生错误：%s"
     unexportingApp: "移除导出的应用程序时发生错误：%s"
     unexportingBin: "移除导出的二进制文件时发生错误：%s"
+    enteringContainer: '进入容器时发生错误：%s'
+    startingContainer: '启动容器时发生错误：%s'
+    stoppingContainer: '停止容器时发生错误：%s'
   info:
     unexportedApps: "已移除导出的 %d 个应用程序"
     exportedApps: "已导出 %d 个应用程序"
@@ -29,6 +45,10 @@ runtimeCommand:
     exportedBin: "已导出二进制文件 %s"
     unexportedApp: "已移除导出的应用程序 %s"
     unexportedBin: "已移除导出的二进制文件 %s"
+    stoppedContainer: 已停止子系统。
+    startedContainer: 已启动子系统。
+    stoppingContainer: 正在停止子系统 %s…
+    startingContainer: 正在启动子系统 %s…
   autoremove:
     description: "移除不再需要的软件包。"
   clean:
@@ -55,7 +75,7 @@ runtimeCommand:
   enter:
     description: "进入子系统的环境。"
   export:
-    description: "从子系统导出应用程序或二进制文件。"
+    description: "从子系统向主机导出应用程序或二进制文件。"
     options:
       appName:
         description: "要导出的应用程序的名称。"
@@ -64,7 +84,7 @@ runtimeCommand:
       binOutput:
         description: "二进制输出的路径（默认为 ~/.local/bin/）。"
   unexport:
-    description: "移除从子系统中导出的应用程序或二进制文件。"
+    description: "从主机中移除导出的应用程序或二进制文件。"
     options:
       appName:
         description: "要移除的导出的应用程序的名称。"
@@ -73,6 +93,12 @@ runtimeCommand:
       binOutput:
         description: "二进制输出的路径（默认为 ~/.local/bin/）。"
 
+  start:
+    description: 启动子系统。
+  stop:
+    description: 停止子系统。
+  run:
+    description: 在子系统内部运行命令。
 pkgmanagers:
   description: "操作 apx 中可用的软件包管理器。"
   labels:
@@ -103,9 +129,9 @@ pkgmanagers:
       askSudo: "软件包管理器是否需要 sudo 才能运行？"
       askCommand: "输入 '%s' 的命令："
       askOverwrite: "名为 '%s' 的软件包管理器已经存在。要覆盖吗？"
-      success: "已创建软件包管理器 '%s'。"
+      askCommandWithDefault: "输入 '%s' 的命令（默认为 '%s'）："
     options:
-      assumeYes:
+      noPrompt:
         description: "为所有操作指定“是”。"
       name:
         description: "软件包管理器的名称。"
@@ -131,6 +157,7 @@ pkgmanagers:
         description: "执行更新可用软件包列表的命令。"
       upgrade:
         description: "执行升级软件包的命令。"
+    success: 软件包管理器 %s 创建成功。
   rm:
     description: "移除指定的软件包管理器。"
 
@@ -138,7 +165,7 @@ pkgmanagers:
       noName: "没有指定名称。"
       inUse: "软件包管理器被用于 %d 个包捆中："
     info:
-      askConfirmation: "确定要移除 '%s' 吗？[y/N]"
+      askConfirmation: "确定要移除 '%s' 吗？"
       success: "已移除软件包管理器 '%s'。"
       aborting: 中止移除软件包管理器 '%s'。
     options:
@@ -147,6 +174,37 @@ pkgmanagers:
       name:
         description: "要移除的软件包管理器的名称。"
 
+  export:
+    options:
+      output:
+        description: 软件包管理器导出到的路径。
+      name:
+        description: 要导出的软件包管理器的名称。
+    error:
+      noOutput: 没有指定输出。
+      noName: 没有指定名称。
+    description: 导出指定的软件包管理器。
+    info:
+      success: 已导出软件包管理器 '%s' 到 '%s'。
+  import:
+    error:
+      noInput: 没有指定输入。
+      cannotLoad: 无法从 '%s' 加载软件包管理器。
+    info:
+      success: 已从 '%s' 导入软件包管理器。
+    description: 导入指定的软件包管理器。
+    options:
+      input:
+        description: 要导入的软件包管理器的路径。
+  update:
+    description: 更新选定的软件包管理器。
+    info:
+      success: 已更新软件包管理器 '%s'。
+      askNewCommand: "输入 '%s' 的新命令（留空以保留 '%s'）："
+    error:
+      noName: 没有指定名称。
+      missingCommand: 缺失 %s 的命令。
+      builtIn: 不能修改内置的软件包管理器。
 stacks:
   description: "操作 apx 中可用的包捆。"
   labels:
@@ -177,6 +235,7 @@ stacks:
       emptyPackages: "软件包不能为空。"
       noPackages: "没有指定软件包。"
       alreadyExists: "名为 '%s' 的包捆已经存在。"
+      noPkgManagers: 无法找到任何软件包管理器。请使用 'apx pkgmanagers new' 创建，或者联系系统管理员。
     info:
       askName: "选择名称："
       askBase: "选择基础映像（如 'vanillaos/pico'）："
@@ -187,12 +246,12 @@ stacks:
       askPackages: "请输入您要安装到包捆中的软件包，用空格隔开："
       success: "已创建包捆 '%s'。"
     options:
-      assumeYes:
+      noPrompt:
         description: "为所有操作指定“是”。"
       name:
         description: "包捆的名称。"
       base:
-        description: "要使用的基础子系统。"
+        description: "要使用的基础发行版映像。（有关兼容映像的列表参见：https://distrobox.it/compatibility/#containers-distros）"
       packages:
         description: "要安装的软件包。"
       pkgManager:
@@ -204,14 +263,17 @@ stacks:
       noBase: "没有指定基础映像。"
       noPkgManager: "没有指定软件包管理器。"
       pkgManagerDoesNotExist: "指定的软件包管理器不存在。请使用 'apx pkgmanagers new' 创建或者联系系统管理员。"
+      builtIn: 不能修改内置的包捆。
     info:
       askBase: "输入新的基础映像或确认使用目前的（%s）："
       askPkgManager: "选择新的软件包管理器或确认使用目前的（%s）："
-      askPackages: "输入想要安装在包捆中的软件包，用空格隔开，或确认使用目前的（%s）："
+      askPackages: "输入想要安装在包捆中的软件包，用空格隔开："
       success: "已更新包捆 '%s'。"
 
+      confirmPackages: 您需要更新软件包列表吗？
+      noPackages: 您没有提供任何要安装在包捆中的软件包。需要添加一些吗？
     options:
-      assumeYes:
+      noPrompt:
         description: "为所有操作指定“是”。"
       name:
         description: "包捆的名称。"
@@ -225,8 +287,9 @@ stacks:
     description: "移除指定的包捆。"
     error:
       noName: "没有指定名称。"
+      inUse: '包捆已被用于 %d 个子系统中：'
     info:
-      askConfirmation: "确定要移除 '%s' 吗？[y/N]"
+      askConfirmation: "确定要移除 '%s' 吗？"
       success: "已移除包捆 '%s'。"
     options:
       force:
@@ -286,17 +349,22 @@ subsystems:
       selectStack: "选择包捆 [1-%d]："
       success: "已创建子系统 '%s'。"
       creatingSubsystem: "正在创建子系统 '%s'，使用包捆 '%s'…"
+      availableStacks: '可用的包捆：'
     options:
       name:
         description: "子系统的名称。"
       stack:
         description: "要使用的包捆。"
+      home:
+        description: 子系统的自定义家目录。
+      init:
+        description: 在子系统内部使用 systemd。
   rm:
     description: "移除指定的子系统。"
     error:
       noName: "没有指定名称。"
     info:
-      askConfirmation: "确定要移除 '%s' 吗？[y/N]"
+      askConfirmation: "确定要移除 '%s' 吗？"
       success: "已移除子系统 '%s'。"
     options:
       force:
@@ -308,7 +376,7 @@ subsystems:
     error:
       noName: "没有指定名称。"
     info:
-      askConfirmation: "确定要重置 '%s' 吗？[y/N]"
+      askConfirmation: "确定要重置 '%s' 吗？"
       success: "已重置子系统 '%s'。"
     options:
       force:

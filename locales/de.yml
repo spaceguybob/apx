@@ -5,12 +5,25 @@ apx:
     unknownCommand: "Unbekannter Befehl: %s"
     invalidInput: "Ungültige Eingabe."
     invalidChoice: Ungültige Wahl.
+    noRoot: Führen Sie Apx nicht als root aus.
   info:
     aborting: "Wie gewünscht abgebrochen."
   terminal:
     yes: "ja"
     no: "nein"
 
+  msg:
+    examples: Beispiele
+    aliases: Aliase
+    usage: Verwendung
+    moreInfo: Verwende %s für weitere Informationen zu einem Befehl
+    flags: Flags
+    additionalCommands: Weitere Befehle
+    version: Version für apx anzeigen.
+    availableCommands: Verfügbare Befehle
+    help: Hilfe für Apx anzeigen.
+    globalFlags: Global Flags
+    additionalHelpTopics: Weitere Hilfethemen
 runtimeCommand:
   description: "Arbeiten Sie mit dem angegebenen Subsystem und greifen Sie auf den
     Paketmanager und die Umgebung zu."
@@ -28,17 +41,24 @@ runtimeCommand:
       %s"
     unexportingBin: "Beim De-Exportieren der Binärdatei ist ein Fehler aufgetreten:
       %s"
+    enteringContainer: 'Beim Betreten des Containers ist ein Fehler aufgetreten: %s'
+    startingContainer: 'Beim Starten des Containers ist ein Fehler aufgetreten: %s'
+    stoppingContainer: 'Ein Fehler ist beim Stoppen des Containers aufgetreten: %s'
   info:
-    unexportedApps: "%d Anwendungen deexportiert"
+    unexportedApps: "Export von %d Anwendungen rückgängig gemacht"
     exportedApps: "%d Anwendungen exportiert"
     exportedApp: "Anwendung %s exportiert"
     exportedBin: "Binärdatei %s exportiert"
-    unexportedApp: "Anwendung %s deexportiert"
-    unexportedBin: "Binärdatei %s deexportiert"
+    unexportedApp: "Export der Anwendung %s rückgängig gemacht"
+    unexportedBin: "Export der Binärdatei %s rückgängig gemacht"
+    stoppedContainer: Subsystem gestoppt.
+    startedContainer: Subsystem gestartet.
+    stoppingContainer: Subsystem %s wird gestoppt…
+    startingContainer: Subsystem %s wird gestartet…
   autoremove:
     description: "Pakete entfernen, die nicht mehr länger benötigt werden."
   clean:
-    description: "Bereinigen Sie den Cache des Paketmanagers."
+    description: "Cache des Paketmanagers leeren."
   install:
     description: "Das angegebene Paket Installieren."
     options:
@@ -70,7 +90,8 @@ runtimeCommand:
       binOutput:
         description: "Pfad der Binärausgabe (Standard: ~/.local/bin/)."
   unexport:
-    description: "Eine Anwendung oder eine Binärdatei aus dem Subsystem exportieren."
+    description: "Export einer Anwendung oder eine Binärdatei aus dem Subsystem rückgängig
+      machen."
     options:
       appName:
         description: "Der Name der Anwendung, die nicht exportiert werden soll."
@@ -79,6 +100,12 @@ runtimeCommand:
       binOutput:
         description: "Pfad der Binärausgabe (Standard: ~/.local/bin/)."
 
+  start:
+    description: Starte das Subsystem.
+  stop:
+    description: Stoppe das Subsystem.
+  run:
+    description: Befehl innerhalb des Subsystems ausführen.
 pkgmanagers:
   description: "Arbeiten Sie mit den Paketmanagern, die in apx verfügbar sind."
   labels:
@@ -111,21 +138,21 @@ pkgmanagers:
       askCommand: "Geben Sie den Befehl für '%s' ein:"
       askOverwrite: "Ein Paketmanager mit dem Namen '%s' existiert bereits. Überschreiben
         Sie ihn?"
-      success: "Paketmanager '%s' erstellt."
+      askCommandWithDefault: "Geben Sie den Befehl für ,%s' ein (Standard: ,%s'):"
     options:
-      assumeYes:
+      noPrompt:
         description: "Alle Fragen mit Ja beantworten."
       name:
         description: "Der Name des Paketmanagers."
       needSudo:
-        description: "Womöglich benötigen der Paketmanager 'sudo' zur Ausführung."
+        description: "Ob der Paketmanager sudo zur Ausführung benötigt."
       autoremove:
         description: "Der Befehl, der zum automatischen Entfernen von Paketen ausgeführt
           werden soll."
       clean:
         description: "Der Befehl, um den Cache des Paketmanagers zu leeren."
       install:
-        description: "Dee Befehl zum ausführen der Paketinstallation."
+        description: "Der Befehl, der zur Paketinstallation ausgeführt werden soll."
       list:
         description: "Der Befehl zum Auflisten aller installierten Pakete."
       purge:
@@ -141,14 +168,15 @@ pkgmanagers:
           zu aktualisieren."
       upgrade:
         description: "Der auszuführende Befehl zum Upgrade von Paketen."
+    success: Paketmanager %s erfolgreich erstellt.
   rm:
     description: "Entfernt den angegebenen Paketmanager."
 
     error:
       noName: "Kein Name angegeben."
-      inUse: "Der Paketmanager wird in %d Stapeln verwendet:"
+      inUse: "Der Paketmanager wird in %d Stacks verwendet:"
     info:
-      askConfirmation: "Sind Sie sicher, dass Sie '%s' entfernen möchten? [j/N]"
+      askConfirmation: "Sind Sie sicher, dass Sie ‚%s‘ entfernen möchten?"
       success: "Paketmanager '%s' entfernt."
       aborting: Das Entfernen des Paketmanagers '%s' wird abgebrochen.
     options:
@@ -157,6 +185,37 @@ pkgmanagers:
       name:
         description: "Der Name des zu entfernenden Paketmanagers."
 
+  export:
+    options:
+      output:
+        description: Der Zielpfad für den Export des Paketmanagers.
+      name:
+        description: Der Name des zu exportierenden Paketmanagers.
+    error:
+      noOutput: Keine Ausgabe angegeben.
+      noName: Kein Name angegeben.
+    description: Exportieren Sie den angegebenen Paketmanager.
+    info:
+      success: Paketmanager '%s' nach '%s' exportiert.
+  import:
+    error:
+      noInput: Keine Eingabe angegeben.
+      cannotLoad: Kann Paketmanager nicht aus '%s' laden.
+    info:
+      success: Paketmanager aus '%s' importiert.
+    description: Importieren Sie den angegebenen Paketmanager.
+    options:
+      input:
+        description: Der Pfad, von dem der Paketmanager importiert werden soll.
+  update:
+    description: Aktualisieren Sie den angegebenen Paketmanager.
+    info:
+      success: Paketmanager '%s' aktualisiert.
+      askNewCommand: "Neuen Befehl für ‚%s‘ eingeben (leer lassen, um ‚%s‘ zu behalten):"
+    error:
+      noName: Kein Name angegeben.
+      missingCommand: Fehlender Befehl für %s.
+      builtIn: Eingebaute Paketmanager können nicht geändert werden.
 stacks:
   description: "Arbeiten Sie mit den Stapeln, die in apx verfügbar sind."
   labels:
@@ -189,6 +248,8 @@ stacks:
       emptyPackages: "Die Pakete dürfen nicht leer sein."
       noPackages: "Keine Pakete angegeben."
       alreadyExists: "Ein Stapel mit dem Namen '%s' existiert bereits."
+      noPkgManagers: Es konnten keine Paketmanager gefunden werden. Erstellen Sie
+        einen mit ‚apx pkgmanagers new‘ oder wenden Sie sich an den Systemadministrator.
     info:
       askName: "Wählen Sie einen Namen:"
       askBase: "Wählen Sie eine Basis (z. B. \"vanillaos/pico\"):"
@@ -201,12 +262,13 @@ stacks:
         durch ein Leerzeichen getrennt ein:"
       success: "Stapel '%s' erstellt."
     options:
-      assumeYes:
+      noPrompt:
         description: "Alle Fragen mit Ja beantworten."
       name:
         description: "Der Name des Stapels."
       base:
-        description: "Das zu verwendende Basis-Subsystem."
+        description: "Das zu verwendende Basis-Distributionsimage. (Für eine Liste
+          der kompatiblen Images besuchen Sie: https://distrobox.it/compatibility/#containers-distros)"
       packages:
         description: "Die zu installierenden Pakete."
       pkgManager:
@@ -219,17 +281,20 @@ stacks:
       noPkgManager: "Kein Paketmanager angegeben."
       pkgManagerDoesNotExist: "Der angegebene Paketmanager existiert nicht. Erstellen
         Sie ihn mit 'apx pkgmanagers new' oder wenden Sie sich an den Systemadministrator."
+      builtIn: Eingebaute Stapel können nicht geändert werden.
     info:
       askBase: "Geben Sie eine neue Basis ein oder bestätigen Sie die aktuelle (%s):"
       askPkgManager: "Wählen Sie einen neuen Paketmanager oder bestätigen Sie den
         aktuellen (%s):"
       askPackages: "Geben Sie die Pakete, die Sie in den Stapel installieren möchten,
-        durch ein Leerzeichen getrennt ein, oder bestätigen Sie die aktuellen Pakete
-        (%s):"
+        durch ein Leerzeichen getrennt ein:"
       success: "Stapel '%s' aktualisiert."
 
+      confirmPackages: Möchten Sie die Liste der Pakete aktualisieren?
+      noPackages: Sie haben keine Pakete zur Installation im Stapel angegeben. Möchten
+        Sie jetzt welche hinzufügen?
     options:
-      assumeYes:
+      noPrompt:
         description: "Alle Fragen mit Ja beantworten."
       name:
         description: "Der Name des Stapels."
@@ -243,8 +308,9 @@ stacks:
     description: "Den angegebenen Stapel entfernen."
     error:
       noName: "Kein Name angegeben."
+      inUse: 'Der Stapel wird in %d Subsystemen verwendet:'
     info:
-      askConfirmation: "Sind Sie sicher, dass Sie '%s' entfernen möchten? [j/N]"
+      askConfirmation: "Sind Sie sicher, dass Sie ‚%s‘ entfernen möchten?"
       success: "Stapel '%s' entfernt."
     options:
       force:
@@ -307,17 +373,22 @@ subsystems:
       selectStack: "Wählen Sie einen Stapel [1-%d]:"
       success: "Subsystem '%s' erstellt."
       creatingSubsystem: "Subsystem '%s' mit Stapel '%s' wird erstellt…"
+      availableStacks: 'Verfügbare Stapel:'
     options:
       name:
         description: "Der Name des Subsystems."
       stack:
         description: "Der zu verwendende Stapel."
+      home:
+        description: Das benutzerdefinierte Homeverzeichnis des Subsystems.
+      init:
+        description: Benutze systemd innerhalb des Subystems.
   rm:
     description: "Das angegebene Subsystem entfernen."
     error:
       noName: "Kein Name angegeben."
     info:
-      askConfirmation: "Sind Sie sicher, dass Sie '%s' entfernen möchten? [j/N]"
+      askConfirmation: "Sind Sie sicher, dass Sie ,%s' entfernen möchten?"
       success: "Das Subsystem '%s' wurde entfernt."
     options:
       force:
@@ -329,7 +400,7 @@ subsystems:
     error:
       noName: "Kein Name angegeben."
     info:
-      askConfirmation: "Sind Sie sicher, dass Sie '%s' zurücksetzen möchten? [j/N]"
+      askConfirmation: "Sind Sie sicher, dass Sie ,%s' zurücksetzen möchten?"
       success: "Das Subsystem '%s' wurde zurückgesetzt."
     options:
       force:

@@ -5,12 +5,25 @@ apx:
     unknownCommand: "Neznámý příkaz: %s"
     invalidInput: "Neplatný vstup."
     invalidChoice: Invalid choice.
+    noRoot: Do not run Apx as root.
   info:
     aborting: "Přerušuji."
   terminal:
     yes: "ano"
     no: "ne"
 
+  msg:
+    examples: Examples
+    aliases: Aliases
+    moreInfo: Use %s for more information about a command
+    usage: Usage
+    flags: Flags
+    additionalCommands: Additional Commands
+    availableCommands: Available Commands
+    version: Show version for apx.
+    help: Show help for apx.
+    globalFlags: Global Flags
+    additionalHelpTopics: Additional help topics
 runtimeCommand:
   description: "Pracovat se specifikovaným subsystémem a tím získat přístup k jeho
     správci balíčků a prostředí."
@@ -24,6 +37,9 @@ runtimeCommand:
     exportingBin: "Nastala chyba během exportování binárního souboru: %s"
     unexportingApp: "Nastala chyba během odexportování aplikace: %s"
     unexportingBin: "Nastala chyba během odexportování binárního souboru: %s"
+    enteringContainer: 'An error occurred while entering the container: %s'
+    startingContainer: 'An error occurred while starting the container: %s'
+    stoppingContainer: 'An error occurred while stopping the container: %s'
   info:
     unexportedApps: "Odexportováno %d aplikací\n"
     exportedApps: "Exportováno %d aplikací\n"
@@ -31,6 +47,10 @@ runtimeCommand:
     exportedBin: "Binární soubor %s exportován\n"
     unexportedApp: "Aplikace %s odexportována\n"
     unexportedBin: "Binární soubor %s odexportován\n"
+    stoppedContainer: Stopped container.
+    startedContainer: Started container.
+    stoppingContainer: Stopping container…
+    startingContainer: Starting container…
   autoremove:
     description: "Smazat balíčky, které už nejsou potřebné."
   clean:
@@ -75,6 +95,12 @@ runtimeCommand:
       binOutput:
         description: "Cesta k binárnímu souboru (default: ~/.local/bin/)."
 
+  start:
+    description: Start the subsystem.
+  stop:
+    description: Stop the subsystem.
+  run:
+    description: Run command inside subsystem.
 pkgmanagers:
   description: "Pracovat se správci balíčků, které jsou dostupné v apx."
   labels:
@@ -106,9 +132,9 @@ pkgmanagers:
       askSudo: "Vyžaduje správce balíčků sudo?"
       askCommand: "Zadejte příkaz pro '%s':"
       askOverwrite: "Správce balíčků s názvem '%s' již existuje. Přepsat ho?"
-      success: "Správce balíčků '%s' vytvořen."
+      askCommandWithDefault: "Enter the command for '%s' (default: '%s'):"
     options:
-      assumeYes:
+      noPrompt:
         description: "Automaticky zadat ano pro všechny dotazy."
       name:
         description: "Název správce balíčků."
@@ -134,6 +160,7 @@ pkgmanagers:
         description: "Příkaz pro aktualizaci seznamu dostupných balíčků."
       upgrade:
         description: "Příkaz pro aktualizaci balíčků."
+    success: Package manager %s created successfully.
   rm:
     description: "Smazat zadaný správce balíčků."
 
@@ -141,7 +168,7 @@ pkgmanagers:
       noName: "Název není uveden."
       inUse: "Správce balíčků se používá v %d zásobnících:\n"
     info:
-      askConfirmation: "Jste si jisti, že chcete odstranit '%s'?"
+      askConfirmation: "Jste si jisti, že chcete odstranit '%s'? [y/N]"
       success: "Odstraněn správce balíčků '%s'."
       aborting: Aborting removal of package manager '%s'.
     options:
@@ -150,6 +177,37 @@ pkgmanagers:
       name:
         description: "Název správce balíčků, který má být odebrán."
 
+  export:
+    options:
+      output:
+        description: The path to export the package manager to.
+      name:
+        description: The name of the package manager to export.
+    error:
+      noOutput: No output specified.
+      noName: No name specified.
+    description: Export the specified package manager.
+    info:
+      success: Exported package manager '%s' to '%s'.
+  import:
+    error:
+      noInput: No input specified.
+      cannotLoad: Cannot load package manager from '%s'.
+    info:
+      success: Imported package manager from '%s'.
+    description: Import the specified package manager.
+    options:
+      input:
+        description: The path to import the package manager from.
+  update:
+    description: Update the specified package manager.
+    info:
+      success: Updated package manager '%s'.
+      askNewCommand: "Enter new command for '%s' (leave empty to keep '%s'):"
+    error:
+      noName: No name specified.
+      missingCommand: Missing command for %s.
+      builtIn: Built-in package managers cannot be modified.
 stacks:
   description: "Práce se stacky, které jsou k dispozici v apx."
   labels:
@@ -182,6 +240,8 @@ stacks:
       emptyPackages: "Balíčky nemůžou být prázdné."
       noPackages: "Nebyly zadány balíčky."
       alreadyExists: "Stack s názvem '%s' již existuje."
+      noPkgManagers: Could not find any package managers. Create one with 'apx pkgmanagers
+        new' or contact the system administrator.
     info:
       askName: "Vyberte název:"
       askBase: "Vyberte základ (např. 'vanillaos/pico'):"
@@ -194,7 +254,7 @@ stacks:
         mezerou:"
       success: "Stack '%s' vytvořen."
     options:
-      assumeYes:
+      noPrompt:
         description: "Automaticky zadat ano pro všechny dotazy."
       name:
         description: "Název stacku."
@@ -212,6 +272,7 @@ stacks:
       noPkgManager: "Není zadán správce balíčků."
       pkgManagerDoesNotExist: "Zadaný správce balíčků neexistuje. Vytvořte ho pomocí
         'apx pkgmanagers new' nebo kontaktujte Vašeho správce systému."
+      builtIn: Built-in stacks cannot be modified.
     info:
       askBase: "Zadejte nový základ nebo potvrďte aktuální (%s):"
       askPkgManager: "Zvolte nový správce balíčků nebo potvrďte aktuální (%s):"
@@ -219,8 +280,11 @@ stacks:
         mezerou nebo potvrďte aktuální (%s):"
       success: "Stack '%s' aktualizován."
 
+      confirmPackages: Do you want to confirm the current packages list?
+      noPackages: You have not provided any packages to install in the stack. Do you
+        want to add some now?
     options:
-      assumeYes:
+      noPrompt:
         description: "Automaticky zadat ano pro všechny dotazy."
       name:
         description: "Název stacku."
@@ -234,6 +298,7 @@ stacks:
     description: "Odstranit zadaný stack."
     error:
       noName: "Název není uveden."
+      inUse: 'The stack is used in %d subsystems:'
     info:
       askConfirmation: "Jste si jisti, že chcete odstranit '%s'?"
       success: "Odstraněn stack '%s'."
@@ -298,11 +363,16 @@ subsystems:
       selectStack: "Vyberte stack [1-%d]:"
       success: "Subsystém '%s' vytvořen."
       creatingSubsystem: "Subsystém '%s' se stackem '%s' vytvořen…"
+      availableStacks: 'Available stacks:'
     options:
       name:
         description: "Název subsystému."
       stack:
         description: "Stack, který se má použít."
+      home:
+        description: The custom home directory of the subsystem.
+      init:
+        description: Use systemd inside the subsystem.
   rm:
     description: "Smazat zadaný subsystém."
     error:
@@ -320,7 +390,7 @@ subsystems:
     error:
       noName: "Název není uveden."
     info:
-      askConfirmation: "Jste si jisti, že chcete resetovat '%s'?"
+      askConfirmation: "Jste si jisti, že chcete resetovat '%s'? [y/N]"
       success: "Subsystém \"%s\" byl resetován."
     options:
       force:

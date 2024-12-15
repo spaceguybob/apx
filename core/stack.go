@@ -4,14 +4,14 @@ package core
 	Authors:
 		Mirko Brombin <send@mirko.pm>
 		Vanilla OS Contributors <https://github.com/vanilla-os/>
-	Copyright: 2023
+	Copyright: 2024
 	Description:
 		Apx is a wrapper around multiple package managers to install Packages and run commands inside a managed container.
 */
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -40,9 +40,11 @@ func NewStack(name, base string, packages []string, pkgManager string, builtIn b
 
 // LoadStack loads a stack from the specified path.
 func LoadStack(name string) (*Stack, error) {
-	stack, err := LoadStackFromPath(filepath.Join(apx.Cnf.UserStacksPath, name+".yaml"))
+	usrStackFile := SelectYamlFile(apx.Cnf.UserStacksPath, name)
+	stack, err := LoadStackFromPath(usrStackFile)
 	if err != nil {
-		stack, err = LoadStackFromPath(filepath.Join(apx.Cnf.StacksPath, name+".yaml"))
+		stackFile := SelectYamlFile(apx.Cnf.StacksPath, name)
+		stack, err = LoadStackFromPath(stackFile)
 	}
 	return stack, err
 }
@@ -56,7 +58,7 @@ func LoadStackFromPath(path string) (*Stack, error) {
 		return nil, errors.New("stack not found")
 	}
 
-	data, err := ioutil.ReadAll(f)
+	data, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +66,10 @@ func LoadStackFromPath(path string) (*Stack, error) {
 	err = yaml.Unmarshal(data, stack)
 	if err != nil {
 		return nil, err
+	}
+
+	if stack.Name == "" || stack.Base == "" || stack.PkgManager == "" {
+		return nil, errors.New("invalid stack file")
 	}
 
 	return stack, nil
@@ -76,8 +82,8 @@ func (stack *Stack) Save() error {
 		return err
 	}
 
-	filePath := filepath.Join(apx.Cnf.UserStacksPath, stack.Name+".yaml")
-	err = ioutil.WriteFile(filePath, data, 0644)
+	filePath := SelectYamlFile(apx.Cnf.UserStacksPath, stack.Name)
+	err = os.WriteFile(filePath, data, 0644)
 	return err
 }
 
@@ -97,7 +103,7 @@ func (stack *Stack) Remove() error {
 		return errors.New("cannot remove built-in stack")
 	}
 
-	filePath := filepath.Join(apx.Cnf.UserStacksPath, stack.Name+".yaml")
+	filePath := SelectYamlFile(apx.Cnf.UserStacksPath, stack.Name)
 	err := os.Remove(filePath)
 	return err
 }
@@ -111,13 +117,13 @@ func (stack *Stack) Export(path string) error {
 		}
 	}
 
-	filePath := filepath.Join(path, stack.Name+".yaml")
+	filePath := SelectYamlFile(path, stack.Name)
 	data, err := yaml.Marshal(stack)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile(filePath, data, 0644)
+	err = os.WriteFile(filePath, data, 0644)
 	if err != nil {
 		return err
 	}
@@ -170,14 +176,17 @@ func ListStackForPkgManager(pkgManager string) []*Stack {
 func listStacksFromPath(path string) []*Stack {
 	stacks := make([]*Stack, 0)
 
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return stacks
 	}
 
 	for _, file := range files {
-		if !file.IsDir() && filepath.Ext(file.Name()) == ".yaml" {
-			stackName := file.Name()[:len(file.Name())-5] // Remove the ".yaml" extension
+		extension := filepath.Ext(file.Name())
+
+		if !file.IsDir() && (extension == ".yaml" || extension == ".yml") {
+			// Remove the ".yaml" or ".yml" extension
+			stackName := file.Name()[:(len(file.Name()) - len(extension))]
 			stack, err := LoadStack(stackName)
 			if err == nil {
 				stacks = append(stacks, stack)

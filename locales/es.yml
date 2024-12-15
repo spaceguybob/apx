@@ -4,13 +4,26 @@ apx:
   errors:
     unknownCommand: "Comando desconocido: %s"
     invalidInput: "Entrada Inválida."
-    invalidChoice: Elección inválida
+    invalidChoice: Elección inválida.
+    noRoot: No ejecutes Apx como root.
   info:
     aborting: "Abortando según lo solicitado."
   terminal:
     yes: "sí"
     no: "no"
 
+  msg:
+    examples: Ejemplos
+    aliases: Alias
+    usage: Uso
+    moreInfo: Utilice %s para obtener más información sobre un comando
+    flags: Banderas
+    additionalCommands: Comandos adicionales
+    availableCommands: Comandos disponibles
+    version: Mostrar la versión del apx.
+    help: Mostrar ayuda para el apx.
+    globalFlags: Banderas globales
+    additionalHelpTopics: Temas de ayuda adicionales
 runtimeCommand:
   description: "Trabaja con el subsistema especificado, accediendo al gestor de paquetes
     y al entorno."
@@ -25,307 +38,366 @@ runtimeCommand:
     exportingBin: "Un error ocurrio mientas se exportaba el binaro: %s"
     unexportingApp: "Un error ocurrio al desexportar una applicación: %s"
     unexportingBin: "Un error ocurrio al desexportar el binario: %s"
+    enteringContainer: 'Ocurrió un error al ingresar al contenedor: %s'
+    startingContainer: 'Se ha producido un error al iniciar el contenedor: %s'
+    stoppingContainer: 'Se ha producido un error al detener el contenedor: %s'
   info:
-    unexportedApps: "Aplicaciones %d no exportadas\n"
-    exportedApps: "Aplicaciones %d exportadas\n"
-    exportedApp: "Aplicación exportada %s\n"
-    exportedBin: "Binario exportado %s\n"
-    unexportedApp: "Aplicación %s no exportada\n"
-    unexportedBin: "Binario no exportado %s\n"
+    unexportedApps: "Aplicaciones %d no exportadas"
+    exportedApps: "Aplicaciones %d exportadas"
+    exportedApp: "Aplicación exportada %s"
+    exportedBin: "Binario exportado %s"
+    unexportedApp: "Aplicación %s no exportada"
+    unexportedBin: "Binario no exportado %s"
+    stoppedContainer: Subsistema detenido.
+    startedContainer: Subsistema iniciado.
+    stoppingContainer: Deteniendo el subsistema %s…
+    startingContainer: Iniciando subsistema %s…
   autoremove:
     description: "Eliminar paquetes ya no requeridos."
   clean:
-    description: "Clean the package manager's cache."
+    description: "Limpia la caché del gestor de paquetes."
   install:
-    description: "Install the specified package."
+    description: "Instala el paquete especificado."
     options:
       noExport:
-        description: "Do not export a desktop entry."
+        description: "No exportar una entrada de escritorio."
   list:
-    description: "List all installed packages."
+    description: "Enumera todos los paquetes instalados."
   purge:
-    description: "Purge the specified packages."
+    description: "Limpiar los paquetes especificados."
   remove:
-    description: "Remove the specified packages."
+    description: "Elimina los paquetes especificados."
   search:
-    description: "Search for packages matching the specified query."
+    description: "Buscar los paquetes que coincidan con la consulta especificada."
   show:
-    description: "Show information about the specified package."
+    description: "Mostrar la información sobre el paquete especificado."
   update:
-    description: "Update the list of available packages."
+    description: "Actualiza la lista de los paquetes disponibles."
   upgrade:
-    description: "Upgrade all installed packages."
+    description: "Actualice todos los paquetes instalados."
   enter:
-    description: "Enter the subsystem's environment."
+    description: "Introduzca el entorno del subsistema."
   export:
-    description: "Export an application or binary from the subsystem."
+    description: "Exporta una aplicación o un binario del subsistema al host."
     options:
       appName:
-        description: "The name of the application to export."
+        description: "El nombre de la aplicación a exportar."
       bin:
-        description: "The name of the binary to export."
+        description: "Nombre del binario a exportar."
       binOutput:
-        description: "Path of the binary output (default: ~/.local/bin/)."
+        description: "Ruta de salida del binario (por defecto: ~/.local/bin/)."
   unexport:
-    description: "Unexport an application or binary from the subsystem."
+    description: "Dejar de exportar una aplicación o binario del host."
     options:
       appName:
-        description: "The name of the application to unexport."
+        description: "El nombre de la aplicación a dejar de exportar."
       bin:
-        description: "The name of the binary to unexport."
+        description: "El nombre del binario a dejar de exportar."
       binOutput:
-        description: "Path of the binary output (default: ~/.local/bin/)."
+        description: "Ruta de salida del binario (por defecto: ~/.local/bin/)."
 
+  start:
+    description: Inicia el subsistema.
+  stop:
+    description: Detén el subsistema.
+  run:
+    description: Ejecutar el comando dentro del subsistema.
 pkgmanagers:
-  description: "Work with the package managers that are available in apx."
+  description: "Trabajar con los gestores de paquetes disponibles en apx."
   labels:
-    name: "Name"
-    builtIn: "Built-in"
+    name: "Nombre"
+    builtIn: "Incorporado"
 
   list:
-    description: "List all available package managers."
+    description: "Listar todos los gestores de paquetes disponibles."
     info:
-      noPkgManagers: "No package managers available. Create a new one with 'apx pkgmanagers
-        new' or contact the system administrator."
-      foundPkgManagers: "Found %d package managers:\n"
+      noPkgManagers: "No hay gestores de paquetes disponibles. Cree uno nuevo con
+        'apx pkgmanagers new' o contacte al administrador del sistema."
+      foundPkgManagers: "%d administrador de paquetes encontrado"
     options:
       json:
-        description: "Output in JSON format."
+        description: "Salida en formato JSON."
   show:
-    description: "Show information about the specified package manager."
+    description: "Mostrar información sobre el gestor de paquetes especificado."
   new:
-    description: "Create a new package manager."
+    description: "Crear un nuevo gestor de paquetes."
 
     error:
-      emptyName: "The name cannot be empty."
-      noName: "No name specified."
-      emptyCommand: "The command cannot be empty."
-      noCommand: "No command specified for '%s'."
-      alreadyExists: "A package manager with the name '%s' already exists."
+      emptyName: "El nombre no puede estar vacío."
+      noName: "No se especificó un nombre."
+      emptyCommand: "El comando no puede estar vacío."
+      noCommand: "No se especificó un comando para '%s'."
+      alreadyExists: "Ya existe un gestor de paquetes con el nombre '%s'."
     info:
-      askName: "Choose a name:"
-      askSudo: "Does the package manager need sudo to run?"
-      askCommand: "Enter the command for '%s':"
-      askOverwrite: "A package manager with the name '%s' already exists. Overwrite
-        it?"
-      success: "Created package manager '%s'."
+      askName: "Elige un nombre:"
+      askSudo: "¿Necesita el gestor de paquetes sudo para ejecutarse?"
+      askCommand: "Ingrese el comando para '%s':"
+      askOverwrite: "Ya existe un gestor de paquetes con el nombre '%s'. ¿Sobrescribirlo?"
+      askCommandWithDefault: "Introduce el comando para '%s' (por defecto: '%s'):"
     options:
-      assumeYes:
-        description: "Assume yes to all prompts."
+      noPrompt:
+        description: "Responder 'sí' a todas las solicitudes."
       name:
-        description: "The name of the package manager."
+        description: "El nombre del gestor de paquetes."
       needSudo:
-        description: "Whether the package manager needs sudo to run."
+        description: "Si el gestor de paquetes necesita sudo para ejecutarse."
       autoremove:
-        description: "The command to run to autoremove packages."
+        description: "El comando para ejecutar el autoremove de paquetes."
       clean:
-        description: "The command to run to clean the package manager's cache."
+        description: "El comando para ejecutar la limpieza de la caché del gestor
+          de paquetes."
       install:
-        description: "The command to run to install packages."
+        description: "El comando a ejecutar para instalar paquetes."
       list:
-        description: "The command to run to list installed packages."
+        description: "El comando a ejecutar para listar los paquetes instalados."
       purge:
-        description: "The command to run to purge packages."
+        description: "El comando a ejecutar para purgar paquetes."
       remove:
-        description: "The command to run to remove packages."
+        description: "El comando a ejecutar para eliminar paquetes."
       search:
-        description: "The command to run to search for packages."
+        description: "El comando a ejecutar para buscar paquetes."
       show:
-        description: "The command to run to show information about packages."
+        description: "El comando a ejecutar para mostrar información sobre los paquetes."
       update:
-        description: "The command to run to update the list of available packages."
+        description: "El comando a ejecutar para actualizar la lista de paquetes disponibles."
       upgrade:
-        description: "The command to run to upgrade packages."
+        description: "El comando a ejecutar para actualizar los paquetes."
+    success: El administrador de paquetes %s se creó correctamente.
   rm:
-    description: "Remove the specified package manager."
+    description: "Elimina el gestor de paquetes especificado."
 
     error:
-      noName: "No name specified."
-      inUse: "The package manager is used in %d stacks:\n"
+      noName: "No se especificó un nombre."
+      inUse: "El gestor de paquetes se utiliza en %d pilas:"
     info:
-      askConfirmation: "Are you sure you want to remove '%s'?"
-      success: "Removed package manager '%s'."
-      aborting: Aborting removal of package manager '%s'.
+      askConfirmation: "¿Estás seguro de que quieres eliminar '%s'?"
+      success: "Eliminado el gestor de paquetes '%s'."
+      aborting: Cancelando la eliminación del gestor de paquetes '%s'.
     options:
       force:
-        description: "Force removal of the package manager."
+        description: "Forzar la eliminación del gestor de paquetes."
       name:
-        description: "The name of the package manager to remove."
+        description: "El nombre del gestor de paquetes a eliminar."
 
-stacks:
-  description: "Work with the stacks that are available in apx."
-  labels:
-    name: "Name"
-    builtIn: "Built-in"
-
-  list:
-    description: "List all available stacks."
-    info:
-      noStacks: "No stacks available. Create a new one with 'apx stacks new' or contact
-        the system administrator."
-      foundStacks: "Found %d stacks:\n"
-      aborting: Aborting removal of stack '%s'.
-    options:
-      json:
-        description: "Output in JSON format."
-  show:
-    description: "Show information about the specified stack."
-  new:
-    description: "Create a new stack."
-    error:
-      emptyName: "The name cannot be empty."
-      noName: "No name specified."
-      emptyBase: "The base cannot be empty."
-      noBase: "No base specified."
-      emptyPkgManager: "The package manager cannot be empty."
-      noPkgManager: "No package manager specified."
-      pkgManagerDoesNotExist: "The specified package manager does not exist. Create
-        it with 'apx pkgmanagers new' or contact the system administrator."
-      emptyPackages: "The packages cannot be empty."
-      noPackages: "No packages specified."
-      alreadyExists: "A stack with the name '%s' already exists."
-    info:
-      askName: "Choose a name:"
-      askBase: "Choose a base (e.g. 'vanillaos/pico'):"
-      askPkgManager: "Choose a package manager:"
-      selectPkgManager: "Select a package manager [1-%d]:"
-      noPackages: "You have not provided any package to install in the stack. Do you
-        want to add some now?"
-      confirmPackages: "Do you want to confirm the current packages list?"
-      askPackages: "Please type the packages you want to install in the stack, separated
-        by a space:"
-      success: "Created stack '%s'."
-    options:
-      assumeYes:
-        description: "Assume yes to all prompts."
-      name:
-        description: "The name of the stack."
-      base:
-        description: "The base subsystem to use."
-      packages:
-        description: "The packages to install."
-      pkgManager:
-        description: "The package manager to use."
-  update:
-    description: "Update the specified stack."
-    error:
-      noName: "No name specified."
-      noBase: "No base specified."
-      noPkgManager: "No package manager specified."
-      pkgManagerDoesNotExist: "The specified package manager does not exist. Create
-        it with 'apx pkgmanagers new' or contact the system administrator."
-    info:
-      askBase: "Type a new base or confirm the current one (%s):"
-      askPkgManager: "Choose a new package manager or confirm the current one (%s):"
-      askPackages: "Type the packages you want to install in the stack, separated
-        by a space, or confirm the current ones (%s):"
-      success: "Updated stack '%s'."
-
-    options:
-      assumeYes:
-        description: "Assume yes to all prompts."
-      name:
-        description: "The name of the stack."
-      base:
-        description: "The base subsystem to use."
-      packages:
-        description: "The packages to install."
-      pkgManager:
-        description: "The package manager to use."
-  rm:
-    description: "Remove the specified stack."
-    error:
-      noName: "No name specified."
-    info:
-      askConfirmation: "Are you sure you want to remove '%s'?"
-      success: "Removed stack '%s'."
-    options:
-      force:
-        description: "Force removal of the stack."
-      name:
-        description: "The name of the stack to remove."
   export:
-    description: "Export the specified stack."
-    error:
-      noName: "No name specified."
-      noOutput: "No output specified."
-    info:
-      success: "Exported stack '%s' to '%s'."
     options:
-      name:
-        description: "The name of the stack to export."
       output:
-        description: "The path to export the stack to."
-  import:
-    description: "Import the specified stack."
+        description: La ruta a la que exportar el gestor de paquetes.
+      name:
+        description: El nombre del gestor de paquetes a exportar.
     error:
-      noInput: "No input specified."
-      cannotLoad: "Cannot load stack from '%s'."
+      noOutput: No se ha especificado ninguna salida.
+      noName: Sin nombre especificado.
+    description: Exporta el gestor de paquetes especificado.
     info:
-      success: "Imported stack from '%s'."
+      success: Gestor de paquetes exportado '%s' a '%s'.
+  import:
+    error:
+      noInput: No se ha especificado entrada.
+      cannotLoad: No se puede cargar el gestor de paquetes de '%s'.
+    info:
+      success: Gestor de paquetes importado de '%s'.
+    description: Importa el gestor de paquetes especificado.
     options:
       input:
-        description: "The path to import the stack from."
-
-subsystems:
-  description: "Work with the subsystems that are available in apx."
+        description: La ruta desde la que importar el gestor de paquetes.
+  update:
+    description: Actualiza el gestor de paquetes especificado.
+    info:
+      success: Actualizado el gestor de paquetes '%s'.
+      askNewCommand: "Ingrese un nuevo comando para '%s' (déjelo vacío para conservar
+        '%s'):"
+    error:
+      noName: Sin nombre especificado.
+      missingCommand: Falta el comando para %s.
+      builtIn: Los gestores de paquetes integrados no pueden modificarse.
+stacks:
+  description: "Trabaja con las pilas disponibles en apx."
   labels:
-    name: "Name"
-    status: "Status"
+    name: "Nombre"
+    builtIn: "Incorporado"
 
   list:
-    description: "List all available subsystems."
-    error:
+    description: "Lista todas las pilas disponibles."
     info:
-      noSubsystems: "No subsystems available. Create a new one with 'apx subsystems
-        new' or contact the system administrator."
-      foundSubsystems: "Found %d subsystems:\n"
+      noStacks: "No hay pilas disponibles. Cree una nueva con 'apx stacks new' o contacte
+        al administrador del sistema."
+      foundStacks: "Encontrados %d stacks:"
+      aborting: Cancelando la eliminación de la pila '%s'.
     options:
       json:
-        description: "Output in JSON format."
+        description: "Salida en formato JSON."
+  show:
+    description: "Mostrar información sobre la pila especificada."
   new:
-    description: "Create a new subsystem."
+    description: "Crea una nueva pila."
     error:
-      noStacks: "A stack is needed to create a subsystem. Create a new one with 'apx
-        stacks new' or contact the system administrator."
-      emptyName: "The name cannot be empty."
-      noName: "No name specified."
-      emptyStack: "The stack cannot be empty."
-      noStack: "No stack specified."
-      stackDoesNotExist: "The specified stack does not exist. Create it with 'apx
-        stacks new' or contact the system administrator."
-      alreadyExists: "A subsystem with the name '%s' already exists."
+      emptyName: "El nombre no puede estar vacío."
+      noName: "No se especifica el nombre."
+      emptyBase: "La base no puede estar vacía."
+      noBase: "Sin base especificada."
+      emptyPkgManager: "El gestor de paquetes no puede estar vacío."
+      noPkgManager: "No se ha especificado ningún gestor de paquetes."
+      pkgManagerDoesNotExist: "El gestor de paquetes especificado no existe. Créelo
+        con 'apx pkgmanagers new' o contacte al administrador del sistema."
+      emptyPackages: "Los paquetes no pueden estar vacíos."
+      noPackages: "No se especificaron paquetes."
+      alreadyExists: "Ya existe una pila con el nombre '%s'."
+      noPkgManagers: No se pudo encontrar ningún administrador de paquetes. Cree uno
+        nuevo con 'apx pkgmanagers' o comuníquese con el administrador del sistema.
     info:
-      askName: "Choose a name:"
-      selectStack: "Select a stack [1-%d]:"
-      success: "Created subsystem '%s'."
-      creatingSubsystem: "Created subsystem '%s' with stack '%s'…"
+      askName: "Elige un nombre:"
+      askBase: "Elija una base (por ejemplo, \"vainillaos/pico\"):"
+      askPkgManager: "Elija un gestor de paquetes:"
+      selectPkgManager: "Seleccione un gestor de paquetes [1-%d]:"
+      noPackages: "No ha proporcionado ningún paquete para instalar en la pila. ¿Desea
+        agregar algunos ahora?"
+      confirmPackages: "¿Desea confirmar la lista actual de paquetes?"
+      askPackages: "Por favor, escriba los paquetes que desee instalar en la pila,
+        separados por un espacio:"
+      success: "Pila creada '%s'."
     options:
+      noPrompt:
+        description: "Asumir 'sí' a todas las solicitudes."
       name:
-        description: "The name of the subsystem."
-      stack:
-        description: "The stack to use."
+        description: "El nombre de la pila."
+      base:
+        description: "La imagen de distribución base a utilizar. (Para ver una lista
+          de imágenes compatibles: https://distrobox.it/compatibility/#containers-distros)"
+      packages:
+        description: "Los paquetes a instalar."
+      pkgManager:
+        description: "El gestor de paquetes a utilizar."
+  update:
+    description: "Actualiza la pila especificada."
+    error:
+      noName: "Sin nombre especificado."
+      noBase: "No se especificó una base."
+      noPkgManager: "No se especificó un gestor de paquetes."
+      pkgManagerDoesNotExist: "El gestor de paquetes especificado no existe. Créelo
+        con 'apx pkgmanagers new' o contacte al administrador del sistema."
+      builtIn: Las pilas incorporadas no pueden modificarse.
+    info:
+      askBase: "Escriba una nueva base o confirme la actual (%s):"
+      askPkgManager: "Elija un nuevo gestor de paquetes o confirme el actual (%s):"
+      askPackages: "Escribe los paquetes que desea instalar en la pila, separados
+        por un espacio:"
+      success: "Pila '%s' actualizada."
+
+      confirmPackages: ¿Deseas actualizar la lista de paquetes?
+      noPackages: No ha proporcionado ningún paquete para instalar en la pila. ¿Quieres
+        agregar algunos ahora?
+    options:
+      noPrompt:
+        description: "Asuma que sí a todas las preguntas."
+      name:
+        description: "El nombre de la pila."
+      base:
+        description: "El subsistema base a utilizar."
+      packages:
+        description: "Los paquetes a instalar."
+      pkgManager:
+        description: "El gestor de paquetes a utilizar."
   rm:
-    description: "Remove the specified subsystem."
+    description: "Elimina la pila especificada."
     error:
-      noName: "No name specified."
+      noName: "Sin nombre especificado."
+      inUse: 'El stack está utilizado en %d subsistemas:'
     info:
-      askConfirmation: "Are you sure you want to remove '%s'?"
-      success: "Removed subsystem '%s'."
+      askConfirmation: "¿Estás seguro de que deseas eliminar '%s'?"
+      success: "Pila eliminada '%s'."
     options:
       force:
-        description: "Force removal of the subsystem."
+        description: "Fuerza la retirada de la pila."
       name:
-        description: "The name of the subsystem to remove."
+        description: "El nombre de la pila a eliminar."
+  export:
+    description: "Exporta la pila especificada."
+    error:
+      noName: "No se especificó un nombre."
+      noOutput: "No se especifica la salida."
+    info:
+      success: "Pila exportada '%s' a '%s'."
+    options:
+      name:
+        description: "El nombre de la pila a exportar."
+      output:
+        description: "La ruta a la que exportar la pila."
+  import:
+    description: "Importa la pila especificada."
+    error:
+      noInput: "No se ha especificado ninguna entrada."
+      cannotLoad: "No se puede cargar la pila de '%s'."
+    info:
+      success: "Pila importada de '%s'."
+    options:
+      input:
+        description: "La ruta desde la que importar la pila."
+
+subsystems:
+  description: "Trabaja con los subsistemas disponibles en apx."
+  labels:
+    name: "Nombre"
+    status: "Estado"
+
+  list:
+    description: "Enumera todos los subsistemas disponibles."
+    error:
+    info:
+      noSubsystems: "No hay subsistemas disponibles. Crea uno nuevo con 'apx subsystems
+        new' o ponte en contacto con el administrador del sistema."
+      foundSubsystems: "Se han encontrado %d subsistemas:"
+    options:
+      json:
+        description: "Salida en formato JSON."
+  new:
+    description: "Crea un nuevo subsistema."
+    error:
+      noStacks: "Se necesita una pila para crear un subsistema. Crea una nueva con
+        'apx stacks new' o ponte en contacto con el administrador del sistema."
+      emptyName: "El nombre no puede estar vacío."
+      noName: "Sin nombre especificado."
+      emptyStack: "La pila no puede estar vacía."
+      noStack: "No se ha especificado la pila."
+      stackDoesNotExist: "La pila especificada no existe. Créela con 'apx stacks new'
+        o póngase en contacto con el administrador del sistema."
+      alreadyExists: "Ya existe un subsistema con el nombre '%s'."
+    info:
+      askName: "Elige un nombre:"
+      selectStack: "Seleccione una pila [1-%d]:"
+      success: "Subsistema creado '%s'."
+      creatingSubsystem: "Creando subsistema '%s' con pila '%s'…"
+      availableStacks: 'Pilas disponibles:'
+    options:
+      name:
+        description: "El nombre del subsistema."
+      stack:
+        description: "La pila a utilizar."
+      home:
+        description: El directorio personal del subsistema.
+      init:
+        description: Utiliza systemd dentro del subsistema.
+  rm:
+    description: "Elimina el subsistema especificado."
+    error:
+      noName: "Sin nombre especificado."
+    info:
+      askConfirmation: "¿Está seguro de que desea eliminar '%s'?"
+      success: "Subsistema eliminado '%s'."
+    options:
+      force:
+        description: "Forzar la eliminación del subsistema."
+      name:
+        description: "El nombre del subsistema a eliminar."
   reset:
-    description: "Reset the specified subsystem."
+    description: "Reinicia el subsistema especificado."
     error:
-      noName: "No name specified."
+      noName: "Sin nombre especificado."
     info:
-      askConfirmation: "Are you sure you want to reset '%s'?"
-      success: "The subsystem '%s' has been reset."
+      askConfirmation: "¿Estás seguro de que quieres restablecer '%s'?"
+      success: "El subsistema '%s' ha sido reiniciado."
     options:
       force:
-        description: "Force reset of the subsystem."
+        description: "Fuerza el reinicio del subsistema."
       name:
-        description: "The name of the subsystem to reset."
+        description: "El nombre del subsistema a resetear."

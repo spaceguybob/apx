@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,13 +13,6 @@ import (
 )
 
 var ProcessPath string
-
-func init() {
-	if RootCheck(false) {
-		fmt.Println("Do not run Apx as root!")
-		os.Exit(1)
-	}
-}
 
 func RootCheck(display bool) bool {
 	if os.Geteuid() != 0 {
@@ -125,4 +119,20 @@ func CopyFile(src, dst string) error {
 	}
 
 	return nil
+}
+
+func SelectYamlFile(basePath string, name string) string {
+	const (
+		YML  string = ".yml"
+		YAML string = ".yaml"
+	)
+
+	yamlFile := filepath.Join(basePath, fmt.Sprintf("%s%s", name, YAML))
+	ymlFile := filepath.Join(basePath, fmt.Sprintf("%s%s", name, YML))
+
+	if _, err := os.Stat(yamlFile); errors.Is(err, os.ErrNotExist) {
+		return ymlFile
+	}
+
+	return yamlFile
 }

@@ -1,16 +1,29 @@
 apx:
-  description: "Apx - это менеджер пакетов с поддержкой нескольких источников, позволяющий
+  description: "Apx — это менеджер пакетов с поддержкой нескольких источников, позволяющий
     устанавливать пакеты в подсистемах."
   errors:
     unknownCommand: "Неизвестная команда: %s"
     invalidInput: "Недопустимый ввод."
     invalidChoice: Недопустимый выбор.
+    noRoot: Не используйте Apx как суперпользователь.
   info:
     aborting: "Прерывать по запросу."
   terminal:
     yes: "да"
     no: "нет"
 
+  msg:
+    examples: Примеры
+    aliases: Псевдонимы
+    usage: Использование
+    availableCommands: Доступные команды
+    moreInfo: Используйте %s для получения дополнительной информации о команде
+    flags: Флаги
+    additionalCommands: Дополнительные команды
+    version: Показать версию apx.
+    help: Показать справку apx.
+    globalFlags: Глобальные флаги
+    additionalHelpTopics: Дополнительные темы справки
 runtimeCommand:
   description: "Работа с указанной подсистемой, обращаясь к менеджеру пакетов и среде."
   error:
@@ -24,6 +37,9 @@ runtimeCommand:
     exportingBin: "Произошла ошибка при экспорте двоичного файла: %s"
     unexportingApp: "Произошла ошибка при деэкспортировании приложения: %s"
     unexportingBin: "Произошла ошибка при деэкспортировании двоичного файла: %s"
+    enteringContainer: 'Произошла ошибка при входе в контейнер: %s'
+    startingContainer: 'Произошла ошибка при запуске контейнера: %s'
+    stoppingContainer: 'Произошла ошибка при остановке контейнера: %s'
   info:
     unexportedApps: "Деэкспортировано %d приложений"
     exportedApps: "Экспортировано %d приложений"
@@ -31,6 +47,10 @@ runtimeCommand:
     exportedBin: "Экспортированный двоичный файл %s"
     unexportedApp: "Деэкспортированное приложение %s"
     unexportedBin: "Деэкспортированный двоичный файл %s"
+    stoppedContainer: Остановленная подсистема.
+    startedContainer: Запущенная подсистема.
+    stoppingContainer: Остановка подсистемы %s…
+    startingContainer: Запуск подсистемы %s…
   autoremove:
     description: "Убрать пакеты, которые больше не требуются."
   clean:
@@ -57,7 +77,7 @@ runtimeCommand:
   enter:
     description: "Войти в среду подсистемы."
   export:
-    description: "Экспортировать приложения или двоичные файлы из подсистемы."
+    description: "Экспортировать приложения или двоичные файлы из подсистемы на хост."
     options:
       appName:
         description: "Имя экспортируемого приложения."
@@ -66,7 +86,7 @@ runtimeCommand:
       binOutput:
         description: "Путь вывода двоичного файла (по умолчанию: ~/.local/bin/)."
   unexport:
-    description: "Деэкспортировать приложение или двоичный файл из подсистемы."
+    description: "Деэкспортировать приложение или двоичный файл из хоста."
     options:
       appName:
         description: "Имя деэкспортируемого приложения."
@@ -75,6 +95,12 @@ runtimeCommand:
       binOutput:
         description: "Путь вывода двоичного файла (по умолчанию: ~/.local/bin/)."
 
+  start:
+    description: Запустить подсистему.
+  stop:
+    description: Остановить подсистему.
+  run:
+    description: Выполнить команду внутри подсистемы.
 pkgmanagers:
   description: "Работа с менеджерами пакетов, которые доступны в apx."
   labels:
@@ -86,7 +112,7 @@ pkgmanagers:
     info:
       noPkgManagers: "Нет доступных менеджеров пакетов. Создайте новый с помощью 'apx
         pkgmanagers new' или обратитесь к системному администратору."
-      foundPkgManagers: "Менеджер(ов) пакетов найдено %d"
+      foundPkgManagers: "Менеджеров пакетов найдено %d"
     options:
       json:
         description: "Вывод в формате JSON."
@@ -106,10 +132,10 @@ pkgmanagers:
       askSudo: "Нужен ли менеджеру пакетов sudo для запуска?"
       askCommand: "Введите команду для '%s':"
       askOverwrite: "Менеджер пакетов с именем '%s' уже существует. Перезаписать его?"
-      success: "Создан менеджер пакетов '%s'."
+      askCommandWithDefault: "Введите команду для '%s' (по умолчанию: '%s'):"
     options:
-      assumeYes:
-        description: "Предполагать \"да\" на все вопросы."
+      noPrompt:
+        description: "Предполагать «да» на все вопросы."
       name:
         description: "Имя менеджера пакетов."
       needSudo:
@@ -134,6 +160,7 @@ pkgmanagers:
         description: "Команда обновляет список доступных пакетов."
       upgrade:
         description: "Команда обновляет пакеты."
+    success: Менеджер пакетов %s успешно создан.
   rm:
     description: "Удалить указанный менеджер пакетов."
 
@@ -141,7 +168,7 @@ pkgmanagers:
       noName: "Имя не указано."
       inUse: "Менеджер пакетов используется в %d стеках:"
     info:
-      askConfirmation: "Вы уверены, что хотите удалить '%s'? [д/Н]"
+      askConfirmation: "Вы уверены, что хотите удалить '%s'?"
       success: "Удалён менеджер пакетов '%s'."
       aborting: Прерывание удаления менеджера пакетов "%s".
     options:
@@ -150,6 +177,38 @@ pkgmanagers:
       name:
         description: "Имя удаляемого менеджера пакетов."
 
+  export:
+    options:
+      output:
+        description: Путь для экспорта менеджера пакетов.
+      name:
+        description: Имя пакетного менеджера для экспорта.
+    error:
+      noOutput: Вывод не указан.
+      noName: Имя не указано.
+    description: Экспортировать выбранный менеджер пакетов.
+    info:
+      success: Экспортирован менеджер пакетов '%s' в '%s'.
+  import:
+    error:
+      noInput: Ввод не выбран.
+      cannotLoad: Невозможно загрузить менеджер пакетов из '%s'.
+    info:
+      success: Импортирован менеджер пакетов из '%s'.
+    description: Импорт выбранного менеджера пакетов.
+    options:
+      input:
+        description: Путь для импорта менеджера пакетов.
+  update:
+    description: Обновить указанный менеджер пакетов.
+    info:
+      success: Обновлен менеджер пакетов '%s'.
+      askNewCommand: "Введите новую команду для '%s' (оставьте пустой, чтобы оставить
+        '%s'):"
+    error:
+      noName: Имя не указано.
+      missingCommand: Отсутствует команда для %s.
+      builtIn: Встроенные пакетные менеджеры не могут быть изменены.
 stacks:
   description: "Работа со стеками, доступными в apx."
   labels:
@@ -182,24 +241,27 @@ stacks:
       emptyPackages: "Пакеты не должны быть пустыми."
       noPackages: "Пакеты не указаны."
       alreadyExists: "Стек с именем '%s' уже существует."
+      noPkgManagers: Не удалось найти ни одного менеджера пакетов. Создайте его с
+        помощью команды 'apx pkgmanagers new' или обратитесь к системному администратору.
     info:
       askName: "Выберите имя:"
       askBase: "Выберите основу (например: 'vanillaos/pico'):"
       askPkgManager: "Выберите менеджер пакетов:"
       selectPkgManager: "Выберите менеджер пакетов [1-%d]:"
       noPackages: "Вы не указали ни одного пакета для добавления в стек. Хотите ли
-        вы добавить его сейчас?"
+        Вы добавить пакеты сейчас?"
       confirmPackages: "Хотите ли вы подтвердить текущий список пакетов?"
       askPackages: "Пожалуйста, введите пакеты, которые вы хотите установить в стеке,
         разделяя их пробелом:"
       success: "Создан стек '%s'."
     options:
-      assumeYes:
-        description: "Предполагать \"да\" на все вопросы."
+      noPrompt:
+        description: "Предполагать «да» на все вопросы."
       name:
         description: "Имя стека."
       base:
-        description: "Основа для использования подсистемы."
+        description: "Образ базового дистрибутива, который будет использоваться. (Список
+          совместимых образов см. по адресу: https://distrobox.it/compatibility/#containers-distros)"
       packages:
         description: "Пакеты для установки."
       pkgManager:
@@ -212,16 +274,20 @@ stacks:
       noPkgManager: "Менеджер пакетов не указан."
       pkgManagerDoesNotExist: "Указанного менеджера пакетов не существует. Создайте
         его с помощью 'apx pkgmanagers new' или обратитесь к системному администратору."
+      builtIn: Встроенные стеки не могут быть изменены.
     info:
       askBase: "Введите новую основу или подтвердите текущую (%s):"
       askPkgManager: "Выберите новый менеджер пакетов или подтвердите текущий (%s):"
       askPackages: "Введите пакеты, которые вы хотите установить в стеке, разделяя
-        их пробелом, или подтвердите текущие (%s):"
+        их пробелом:"
       success: "Обновлён стек '%s'."
 
+      confirmPackages: Вы хотите обновить список пакетов?
+      noPackages: Вы не указали ни одного пакета для установки в стек. Хотите ли Вы
+        добавить их сейчас?
     options:
-      assumeYes:
-        description: "Предполагать \"да\" на все вопросы."
+      noPrompt:
+        description: "Предполагать «да» на все вопросы."
       name:
         description: "Имя стека."
       base:
@@ -234,8 +300,9 @@ stacks:
     description: "Удалить указанный стек."
     error:
       noName: "Имя не указано."
+      inUse: 'Стек использован в %d подсистемах:'
     info:
-      askConfirmation: "Вы уверены, что хотите удалить '%s'? [д/Н]"
+      askConfirmation: "Вы уверены, что хотите удалить '%s'?"
       success: "Удалён стек '%s'."
     options:
       force:
@@ -298,17 +365,22 @@ subsystems:
       selectStack: "Выберите стек [1-%d]:"
       success: "Создана подсистема '%s'."
       creatingSubsystem: "Создание подсистемы '%s' со стеком '%s'…"
+      availableStacks: 'Доступные стеки:'
     options:
       name:
         description: "Имя подсистемы."
       stack:
         description: "Используемый стек."
+      home:
+        description: Пользовательский домашний каталог подсистемы.
+      init:
+        description: Использовать systemd внутри подсистемы.
   rm:
     description: "Удалить указанную подсистему."
     error:
       noName: "Имя не указано."
     info:
-      askConfirmation: "Вы уверены, что хотите удалить '%s'? [д/Н]"
+      askConfirmation: "Вы уверены, что хотите удалить '%s'?"
       success: "Удалена подсистема '%s'."
     options:
       force:
@@ -320,7 +392,7 @@ subsystems:
     error:
       noName: "Имя не указано."
     info:
-      askConfirmation: "Вы уверены, что хотите сбросить '%s'? [д/Н]"
+      askConfirmation: "Вы уверены, что хотите сбросить '%s'?"
       success: "Подсистема '%s' была сброшена."
     options:
       force:

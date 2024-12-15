@@ -4,12 +4,25 @@ apx:
     unknownCommand: "أمر غير معروف: %s"
     invalidInput: "المدخل غير صالح."
     invalidChoice: خيار غير صالح.
+    noRoot: لا تقم بتشغيل Apx كروت.
   info:
     aborting: "يتم الالغاء."
   terminal:
     yes: "نعم"
     no: "لا"
 
+  msg:
+    examples: أمثلة
+    aliases: اسماء مستعارة
+    usage: الاستخدام
+    moreInfo: استخدم %s للمزيد من المعلومات حول الأمر
+    flags: أعلام
+    additionalCommands: الأوامر الإضافية
+    availableCommands: الأوامر المتاحة
+    version: إظهار الإصدار لـapx
+    help: إظهار المساعدة لـapx
+    globalFlags: أعلام عامة
+    additionalHelpTopics: مواضيع مساعدة إضافية
 runtimeCommand:
   description: "يتعامل مع النظام الفرعي المحدد، مما يسمح باستخدام مدير الحزم و البيئة."
   error:
@@ -22,13 +35,20 @@ runtimeCommand:
     exportingBin: "حدث خطأ أثناء تصدير البرنامج: %s"
     unexportingApp: "حدث خطأ أثناء إلغاء تصدير التطبيق: %s"
     unexportingBin: "حدث خطأ أثناء إلغاء تصدير البرنامج: %s"
+    enteringContainer: 'حدث خطأ ما أثناء إدخال الحاوية: %s'
+    startingContainer: 'حدث خطأ ما أثناء بدء تشغيل الحاوية: %s'
+    stoppingContainer: 'حدث خطأ ما أثناء إيقاف الحاوية: %s'
   info:
-    unexportedApps: "%d تطبيقات غير مصدرة\n"
-    exportedApps: "%d تطبيقات مصدرة\n"
-    exportedApp: "التطبيقات المصدرة %s\n"
-    exportedBin: "البرامج المصدرة %s\n"
-    unexportedApp: "التطبيقات غير المصدرة %s\n"
-    unexportedBin: "البرامج غير المصدرة %s\n"
+    unexportedApps: "تطبيقات %d غير مصدرة"
+    exportedApps: "تم تصدير٪ d من التطبيقات"
+    exportedApp: "التطبيقات المصدرة %s"
+    exportedBin: "البرامج المصدرة %s"
+    unexportedApp: "التطبيقات غير المصدرة %s"
+    unexportedBin: "البرامج غير المصدرة %s"
+    stoppedContainer: حاوية متوقفة.
+    startedContainer: بدأت الحاوية.
+    stoppingContainer: جارٍ إيقاف الحاوية…
+    startingContainer: جارٍ بدء الحاوية…
   autoremove:
     description: "حذف الحزم التي لم تعد مطلوبة."
   clean:
@@ -55,7 +75,7 @@ runtimeCommand:
   enter:
     description: "دخول بيئة النظام الفرعي."
   export:
-    description: "تصدير تطبيق او برنامج من النظام الفرعي."
+    description: "تصدير تطبيق أو برنامج من النظام الفرعي."
     options:
       appName:
         description: "اسم التطبيق المراد تصدير."
@@ -73,6 +93,12 @@ runtimeCommand:
       binOutput:
         description: "مسار البرامج\n(الافتراضي /.local/bin/)"
 
+  start:
+    description: بدء تشغيل النظام الفرعي.
+  stop:
+    description: إيقاف النظام الفرعي.
+  run:
+    description: تشغيل الأمر داخل النظام الفرعي.
 pkgmanagers:
   description: "يتعامل مع مديري الحزم المتاحة في apx."
   labels:
@@ -84,7 +110,7 @@ pkgmanagers:
     info:
       noPkgManagers: "لا يوجد مدير حزم متاح. قم بإنشاء واحد جديد باستخدام 'apx pkgmanagers
         new' او تحدث مع مسئول النظام."
-      foundPkgManagers: "تم ايجاد %d مديري حزم:\n"
+      foundPkgManagers: "تم ايجاد %d مديري حزم:"
     options:
       json:
         description: "المخرجات في صورة JSON."
@@ -104,9 +130,9 @@ pkgmanagers:
       askSudo: "هل يحتاج مدير الحزم إلى sudo ليعمل؟"
       askCommand: "أدخل الامر لأجل '%s':"
       askOverwrite: "يوجد مدير حزم بنفس الاسم '%s' بالفعل. هل تريد استبداله؟"
-      success: "تم إنشاء مدير الحزم '%s'."
+      askCommandWithDefault: "Enter the command for '%s' (default: '%s'):"
     options:
-      assumeYes:
+      noPrompt:
         description: "افرض الإجابة \"نعم\" لكل الاختيارات."
       name:
         description: "اسم مدير الحزم."
@@ -132,12 +158,13 @@ pkgmanagers:
         description: "الامر الخاص بتحديث قائمة الحزم المتاحة."
       upgrade:
         description: "الامر الخاص بتطوير الحزم."
+    success: تم إنشاء مدير الحزم %s بنجاح.
   rm:
     description: "حذف مدير الحزم المحدد."
 
     error:
       noName: "لم يتم تحديد اسم."
-      inUse: "مدير الحزم مستخدم في %d تشكيلات:\n"
+      inUse: "مدير الحزم مستخدم في %d طبقات:"
     info:
       askConfirmation: "هل انت متأكد من حذف '%s'؟"
       success: "تم حذف مدير الحزم '%s'."
@@ -148,6 +175,37 @@ pkgmanagers:
       name:
         description: "اسم مدير الحزم المراد حذفه."
 
+  export:
+    options:
+      output:
+        description: المسار المراد لتصدير مدير الحزم إليه
+      name:
+        description: اسم مدير الحزم المراد تصديره.
+    error:
+      noOutput: لم يتم تحديد الإخراج.
+      noName: لم يتم تحديد اسم.
+    description: تصدير مدير الحزم المحدد.
+    info:
+      success: تم تصدير مدير الحزم '%s' إلى '%s'.
+  import:
+    error:
+      noInput: لم يتم تحديد أي إدخال.
+      cannotLoad: لا يمكن تحميل مدير الحزم من '%s'.
+    info:
+      success: مدير الحزم المستورد من '%s'.
+    description: قم باستيراد مدير الحزم المحدد.
+    options:
+      input:
+        description: المسار لاستيراد مدير الحزم منه.
+  update:
+    description: قم بتحديث مدير الحزم المحدد.
+    info:
+      success: تم تحديث مدير الحزم '%s'.
+      askNewCommand: "أدخل أمرًا جديدًا لأجل '%s' (اتركه فارغًا للإبقاء على '%s'):"
+    error:
+      noName: لم يتم تحديد اسم.
+      missingCommand: الأمر مفقود لأجل %s.
+      builtIn: Built-in package managers cannot be modified.
 stacks:
   description: "تستخدم التشكيلات المتاحة في apx."
   labels:
@@ -159,7 +217,7 @@ stacks:
     info:
       noStacks: "لا توجد تشكيلات متاحة. قم بإنشاء واحدة جديدة باستخدام 'apx stacks
         new' او قم بالتحدث الي مسئول النظام."
-      foundStacks: "تم العثور على %d تشكيلات:\n"
+      foundStacks: "تم العثور على %d طبقات:"
       aborting: إلغاء حذف التشكيلة '%s'.
     options:
       json:
@@ -180,6 +238,8 @@ stacks:
       emptyPackages: "الحزم لا يمكن أن تكون فارغة."
       noPackages: "لم يتم تحديد حزم."
       alreadyExists: "يوجد تشكيلة بالاسم '%s' بالفعل."
+      noPkgManagers: لا توجد تشكيلات متاحة. قم بإنشاء واحدة جديدة باستخدام 'apx stacks
+        new' أو تحدث إلى مسؤول النظام.
     info:
       askName: "اختر اسما:"
       askBase: "اختر النظام الأساس (على سبيل المثال 'vanillaos/pico'):"
@@ -191,12 +251,12 @@ stacks:
       askPackages: "من فضلك قم بكتابة الحزم المراد تنزيلها في التشكيلة مع فصلها بمسافة:"
       success: "تم إنشاء التشكيلة '%s'."
     options:
-      assumeYes:
+      noPrompt:
         description: "افرض الإجابة \"نعم\" لكل الاختيارات."
       name:
         description: "اسم التشكيلة."
       base:
-        description: "النظام الفرعي المراد استخدامه كأساس."
+        description: "صورة التوزيعة الأساسية المراد استخدامها."
       packages:
         description: "الحزم المراد تثبيتها."
       pkgManager:
@@ -209,6 +269,7 @@ stacks:
       noPkgManager: "لم يتم تحديد مدير حزم."
       pkgManagerDoesNotExist: "مدير الحزم المحدد غير موجود. قم بإنشاء واحد جديد باستخدام
         'apx pkgmanagers new' او قم بالتحدث لمسؤول النظام."
+      builtIn: Built-in stacks cannot be modified.
     info:
       askBase: "قم بكتابة نظام أساس جديد أو وافق على الحالي(%s):"
       askPkgManager: "قم باختيار مدير حزم جديد أو وافق على الحالي(%s):"
@@ -216,8 +277,10 @@ stacks:
         وافق على الحاليين (%s):"
       success: "تم تحديث التشكيلة '%s':"
 
+      confirmPackages: هل تريد الموافقة على قائمة الحزم الحالية؟
+      noPackages: لم تقم بتوفير أي حزم لتثبيتها في التشكيلة. هل تريد إضافة بعضها الآن؟
     options:
-      assumeYes:
+      noPrompt:
         description: "افرض الإجابة \"نعم\" لكل الاختيارات."
       name:
         description: "اسم التشكيلة."
@@ -231,6 +294,7 @@ stacks:
     description: "حذف التشكيلة المحددة."
     error:
       noName: "لم يتم تحديد اسم."
+      inUse: 'The stack is used in %d subsystems:'
     info:
       askConfirmation: "هل انت متأكد من حذف '%s'؟"
       success: "تم حذف التشكيلة '%s'."
@@ -274,7 +338,7 @@ subsystems:
     info:
       noSubsystems: "لا يوجد أنظمة فرعية متاحة. قم بإنشاء واحد جديد باستخدام 'apx
         subsystems new' او قم بالتحدث لمسؤول النظام."
-      foundSubsystems: "تم العثور على %d أنظمة فرعية:\n"
+      foundSubsystems: "تم العثور على %d أنظمة فرعية:"
     options:
       json:
         description: "المخرجات في صورة JSON."
@@ -294,12 +358,17 @@ subsystems:
       askName: "اختر اسما:"
       selectStack: "اختر تشكيلة [1-%d]:"
       success: "تم إنشاء النظام الفرعي '%s'."
-      creatingSubsystem: "تم إنشاء نظام فرعي '%s' بالتشكيلة '%s'…"
+      creatingSubsystem: "تم إنشاء نظام فرعي '%s' بالطبقة '%s'…"
+      availableStacks: 'التشكيلات المتاحة:'
     options:
       name:
         description: "اسم النظام الفرعي."
       stack:
         description: "التشكيلة المراد استخدامها."
+      home:
+        description: الدليل الرئيسي المخصص للنظام الفرعي.
+      init:
+        description: استخدم systemd داخل النظام الفرعي.
   rm:
     description: "حذف النظام الفرعي المحدد."
     error:
@@ -317,7 +386,7 @@ subsystems:
     error:
       noName: "لم يتم تحديد اسم."
     info:
-      askConfirmation: "هل انت متأكد من إعادة إنشاء '%s'؟"
+      askConfirmation: "هل انت متأكد من إعادة ضبط '%s'؟"
       success: "تم اعادة انشاء النظام الفرعي '%s'."
     options:
       force:

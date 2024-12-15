@@ -4,7 +4,7 @@ package settings
 	Authors:
 		Mirko Brombin <send@mirko.pm>
 		Vanilla OS Contributors <https://github.com/vanilla-os/>
-	Copyright: 2023
+	Copyright: 2024
 	Description:
 		Apx is a wrapper around multiple package managers to install packages and run commands inside a managed container.
 */
@@ -12,6 +12,7 @@ package settings
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -64,9 +65,23 @@ func GetApxDefaultConfig() (*Config, error) {
 	// 	fmt.Printf("Using config file: %s\n\n", viper.ConfigFileUsed())
 	// }
 
+	distroboxPath := viper.GetString("distroboxPath")
+
+	_, err = os.Stat(distroboxPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			path, err := exec.LookPath("distrobox")
+			if err != nil {
+				fmt.Printf("Unable to find distrobox in PATH.\n")
+			} else {
+				distroboxPath = path
+			}
+		}
+	}
+
 	Cnf := NewApxConfig(
 		viper.GetString("apxPath"),
-		viper.GetString("distroboxPath"),
+		distroboxPath,
 		viper.GetString("storageDriver"),
 	)
 	return Cnf, nil

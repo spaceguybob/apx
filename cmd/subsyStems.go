@@ -4,7 +4,7 @@ package cmd
 	Authors:
 		Mirko Brombin <send@mirko.pm>
 		Pietro di Caprio <pietro@fabricators.ltd>
-	Copyright: 2023
+	Copyright: 2024
 	Description: Apx is a wrapper around multiple package managers to install packages and run commands inside a managed container.
 */
 
@@ -16,7 +16,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vanilla-os/apx/core"
+	"github.com/vanilla-os/apx/v2/core"
 	"github.com/vanilla-os/orchid/cmdr"
 )
 
@@ -66,8 +66,24 @@ func NewSubSystemsCommand() *cmdr.Command {
 		cmdr.NewStringFlag(
 			"name",
 			"n",
-			apx.Trans("subsystems.new.options.name"),
+			apx.Trans("subsystems.new.options.name.description"),
 			"",
+		),
+	)
+	newCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"home",
+			"H",
+			apx.Trans("subsystems.new.options.home.description"),
+			"",
+		),
+	)
+	newCmd.WithBoolFlag(
+		cmdr.NewBoolFlag(
+			"init",
+			"i",
+			apx.Trans("subsystems.new.options.init.description"),
+			false,
 		),
 	)
 
@@ -83,7 +99,7 @@ func NewSubSystemsCommand() *cmdr.Command {
 		cmdr.NewStringFlag(
 			"name",
 			"n",
-			apx.Trans("subsystems.rm.options.name"),
+			apx.Trans("subsystems.rm.options.name.description"),
 			"",
 		),
 	)
@@ -133,7 +149,7 @@ func NewSubSystemsCommand() *cmdr.Command {
 func listSubSystems(cmd *cobra.Command, args []string) error {
 	jsonFlag, _ := cmd.Flags().GetBool("json")
 
-	subSystems, err := core.ListSubSystems(false)
+	subSystems, err := core.ListSubSystems(false, false)
 	if err != nil {
 		return err
 	}
@@ -173,8 +189,10 @@ func listSubSystems(cmd *cobra.Command, args []string) error {
 }
 
 func newSubSystem(cmd *cobra.Command, args []string) error {
+	home, _ := cmd.Flags().GetString("home")
 	stackName, _ := cmd.Flags().GetString("stack")
 	subSystemName, _ := cmd.Flags().GetString("name")
+	isInit, _ := cmd.Flags().GetBool("init")
 
 	stacks := core.ListStacks()
 	if len(stacks) == 0 {
@@ -186,13 +204,13 @@ func newSubSystem(cmd *cobra.Command, args []string) error {
 		cmdr.Info.Println(apx.Trans("subsystems.new.info.askName"))
 		fmt.Scanln(&subSystemName)
 		if subSystemName == "" {
-			cmdr.Error.Println(apx.Trans("apx.error.noName"))
+			cmdr.Error.Println(apx.Trans("subsystems.new.error.emptyName"))
 			return nil
 		}
 	}
 
 	if stackName == "" {
-		cmdr.Info.Println(apx.Trans("subsystems.new.info.askStack"))
+		cmdr.Info.Println(apx.Trans("subsystems.new.info.availableStacks"))
 		for i, stack := range stacks {
 			fmt.Printf("%d. %s\n", i+1, stack.Name)
 		}
@@ -201,22 +219,29 @@ func newSubSystem(cmd *cobra.Command, args []string) error {
 		var stackIndex int
 		_, err := fmt.Scanln(&stackIndex)
 		if err != nil {
-			cmdr.Error.Println(apx.Trans("apx.error.invalidInput"))
+			cmdr.Error.Println(apx.Trans("apx.errors.invalidInput"))
 			return nil
 		}
 
 		if stackIndex < 1 || stackIndex > len(stacks) {
-			cmdr.Error.Println(apx.Trans("apx.error.invalidInput"))
+			cmdr.Error.Println(apx.Trans("apx.errors.invalidInput"))
 			return nil
 		}
 
 		stackName = stacks[stackIndex-1].Name
 	}
 
-	checkSubSystem, err := core.LoadSubSystem(subSystemName)
+	checkSubSystem, err := core.LoadSubSystem(subSystemName, false)
 	if err == nil {
 		cmdr.Error.Printf(apx.Trans("subsystems.new.error.alreadyExists"), checkSubSystem.Name)
 		return nil
+	}
+
+	for _, existcommand := range cmd.Root().Commands() {
+		if subSystemName == existcommand.Name() {
+			cmdr.Error.Printfln(apx.Trans("subsystems.new.error.forbiddenName"), subSystemName)
+			return nil
+		}
 	}
 
 	stack, err := core.LoadStack(stackName)
@@ -224,7 +249,7 @@ func newSubSystem(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	subSystem, err := core.NewSubSystem(subSystemName, stack, false, false)
+	subSystem, err := core.NewSubSystem(subSystemName, stack, home, isInit, false, false, false, true, "")
 	if err != nil {
 		return err
 	}
@@ -251,7 +276,7 @@ func rmSubSystem(cmd *cobra.Command, args []string) error {
 	}
 
 	if !forceFlag {
-		cmdr.Info.Printfln(apx.Trans("subsystems.rm.info.askConfirmation"), subSystemName)
+		cmdr.Info.Printfln(apx.Trans("subsystems.rm.info.askConfirmation")+` [y/N]`, subSystemName)
 		var confirmation string
 		fmt.Scanln(&confirmation)
 		if strings.ToLower(confirmation) != "y" {
@@ -260,7 +285,7 @@ func rmSubSystem(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	subSystem, err := core.LoadSubSystem(subSystemName)
+	subSystem, err := core.LoadSubSystem(subSystemName, false)
 	if err != nil {
 		return err
 	}
@@ -285,7 +310,7 @@ func resetSubSystem(cmd *cobra.Command, args []string) error {
 	forceFlag, _ := cmd.Flags().GetBool("force")
 
 	if !forceFlag {
-		cmdr.Info.Printfln(apx.Trans("subsystems.reset.info.askConfirmation"), subSystemName)
+		cmdr.Info.Printfln(apx.Trans("subsystems.reset.info.askConfirmation")+` [y/N]`, subSystemName)
 		var confirmation string
 		fmt.Scanln(&confirmation)
 		if strings.ToLower(confirmation) != "y" {
@@ -294,7 +319,7 @@ func resetSubSystem(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	subSystem, err := core.LoadSubSystem(subSystemName)
+	subSystem, err := core.LoadSubSystem(subSystemName, false)
 	if err != nil {
 		return err
 	}

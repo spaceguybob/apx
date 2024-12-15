@@ -1,65 +1,65 @@
 apx:
-  description: "O Apx é um gerenciador de pacotes com suporte para várias origens,
-    permitindo que você instale pacotes em subsistemas."
+  description: "O Apx é um gestor de pacotes com suporte para várias origens, permitindo
+    que instale pacotes em subsistemas."
   errors:
     unknownCommand: "Comando desconhecido: %s"
     invalidInput: "Entrada inválida."
-    invalidChoice: Escolha inválida.
-    noRoot: Não execute Apx como root.
+    invalidChoice: "Escolha inválida."
+    noRoot: "Não execute Apx como root."
   info:
-    aborting: "Abortando conforme solicitado."
+    aborting: "A abortar conforme solicitado."
   terminal:
     yes: "sim"
     no: "não"
 
   msg:
     examples: Exemplos
-    flags: Sinalizadores
-    aliases: Funções sinônimas
-    usage: Uso
     moreInfo: Use %s para mais informações sobre um comando
-    additionalCommands: Comandos Adicionais
+    flags: Flags
+    aliases: Apelidos
+    usage: Uso
+    additionalCommands: Comandos adicionais
     availableCommands: Comandos Disponíveis
-    version: Mostrar versão do Apx.
-    help: Mostrar ajuda para apx.
-    globalFlags: Sinalizadores globais
-    additionalHelpTopics: Tópicos adicionais de ajuda
+    help: Mostrar ajuda para o apx.
+    version: Exibir versão do apx.
+    globalFlags: Global Flags
+    additionalHelpTopics: Tópicos de ajuda adicional
 runtimeCommand:
-  description: "Trabalhe com o subsistema especificado, acessando o gerenciador de
-    pacotes e o ambiente."
+  description: "Trabalhe com o subsistema especificado, a aceder o gestor de pacotes
+    e o ambiente."
   error:
+    enteringContainer: "Ocorreu um erro ao entrar no contentor: %s"
     noPackageSpecified: "Não há pacotes especificados."
-    cantAccessPkgManager: "Ocorreu um erro ao acessar o gerenciador de pacotes: %s"
+    cantAccessPkgManager: "Ocorreu um erro ao aceder o gestor de pacotes: %s"
     executingCommand: "Ocorreu um erro durante a execução do comando: %s"
     noAppNameOrBin: "--app-name ou --bin devem ser especificados."
     sameAppOrBin: "--app-name e --bin não podem ser especificados simultaneamente."
-    exportingApp: "Ocorreu um erro ao exportar o aplicativo: %s"
+    exportingApp: "Ocorreu um erro ao exportar a aplicação: %s"
     exportingBin: "Ocorreu um erro ao exportar o binário: %s"
-    unexportingApp: "Ocorreu um erro ao desfazer a exportação do aplicativo: %s"
+    unexportingApp: "Ocorreu um erro ao desfazer a exportação da aplicação: %s"
     unexportingBin: "Ocorreu um erro ao desfazer a exportação do binário: %s"
-    enteringContainer: 'Ocorreu um erro ao entrar no contêiner: %s'
-    startingContainer: 'Ocorreu um erro ao iniciar o contêiner: %s'
-    stoppingContainer: 'Ocorreu um erro ao parar o contêiner: %s'
+    startingContainer: "Ocorreu um erro ao iniciar o contentor: %s"
+    stoppingContainer: "Ocorreu um erro ao parar o contentor: %s"
   info:
-    unexportedApps: "Desfeita a exportação de %d aplicativos"
+    unexportedApps: "Desfeita a exportação de %d aplicações"
     exportedApps: "Aplicações %d exportadas"
-    exportedApp: "Aplicativo exportado %s"
+    exportedApp: "Aplicação exportada %s"
     exportedBin: "Binário exportado %s"
-    unexportedApp: "Desfeita a exportação do aplicativo %s"
+    unexportedApp: "Desfeita a exportação da aplicação %s"
     unexportedBin: "Desfeita a exportação do binário %s"
-    stoppedContainer: Subsistema parado.
-    startedContainer: Subsistema iniciado.
-    stoppingContainer: Parando o subsistema %s…
-    startingContainer: Iniciando subsistema %s…
+    startingContainer: "A inicializar contentor…"
+    startedContainer: "Contentor inicializado."
+    stoppingContainer: "A parar o contentor…"
+    stoppedContainer: "Contentor parado."
   autoremove:
     description: "Remover pacotes que não são mais necessários."
   clean:
-    description: "Limpar o cache do gerenciador de pacotes."
+    description: "Limpar o cache do gestor de pacotes."
   install:
     description: "Instalar o pacote especificado."
     options:
       noExport:
-        description: "Não exportar um registro da área de trabalho."
+        description: "Não exportar um registo da área de trabalho."
   list:
     description: "Listar todos os pacotes instalados."
   purge:
@@ -77,75 +77,74 @@ runtimeCommand:
   enter:
     description: "Entrar no ambiente de subsistema."
   export:
-    description: "Exportar um aplicativo ou binário do subsistema para o host."
+    description: "Exportar uma aplicação ou binário do subsistema, para o sistema
+      raiz."
     options:
       appName:
-        description: "O nome do aplicativo a exportar."
+        description: "O nome da aplicação a exportar."
       bin:
         description: "O nome do binário a exportar."
       binOutput:
         description: "Caminho para a saída do binário (padrão: ~/.local/bin/)."
   unexport:
-    description: "Desfazer exportação de um aplicativo ou binário do host."
+    description: "Remover a exportação do aplicativo ou binário do sistema raiz."
     options:
       appName:
-        description: "O nome do aplicativo a ter sua exportação desfeita."
+        description: "O nome da aplicação a ter a sua exportação desfeita."
       bin:
-        description: "O nome do binário a ter sua exportação desfeita."
+        description: "O nome do binário a ter a sua exportação desfeita."
       binOutput:
         description: "Caminho de saída do binário (padrão: ~/.local/bin/)."
-
   start:
-    description: Inicie o subsistema.
+    description: "Inicie o subsistema."
   stop:
-    description: Pare o subsistema.
+    description: "Pare o subsistema."
+
   run:
-    description: Execute o comando dentro do subsistema.
+    description: Execute o comando dentro do subsistema
 pkgmanagers:
-  description: "Trabalhar com os gerenciadores de pacotes que estão disponíveis no
-    apx."
+  description: "Trabalhar com os gestores de pacotes que estão disponíveis no apx."
   labels:
     name: "Nome"
     builtIn: "Embutido"
 
   list:
-    description: "Listar todos os gerenciadores de pacotes disponíveis."
+    description: "Listar todos os gestores de pacotes disponíveis."
     info:
-      noPkgManagers: "Nenhum gerenciador de pacote disponível. Crie um utilizando
-        'apx pkgmanagers new' ou entre em contato com o administrador do sistema."
-      foundPkgManagers: "Encontrados %d gerenciadores de pacotes"
+      noPkgManagers: "Nenhum gestor de pacote disponível. Crie um utilizando 'apx
+        pkgmanagers new' ou entre em contato com o administrador do sistema."
+      foundPkgManagers: "Encontrados %d gestores de pacotes"
     options:
       json:
         description: "Saída em formato JSON."
   show:
-    description: "Mostrar informações sobre o gerenciador de pacotes especificado."
+    description: "Mostrar informações sobre o gestor de pacotes especificado."
   new:
-    description: "Criar um novo gerenciador de pacotes."
+    description: "Criar um novo gestor de pacotes."
 
     error:
       emptyName: "O nome não pode ser vazio."
       noName: "Nenhum nome especificado."
       emptyCommand: "O comando não pode ser vazio."
       noCommand: "Nenhum comando especificado para '%s'."
-      alreadyExists: "Um gerenciador de pacotes com o nome '%s' já existe."
+      alreadyExists: "Um gestor de pacotes com o nome '%s' já existe."
     info:
       askName: "Escolha um nome:"
-      askSudo: "O gerenciador de pacotes precisa do sudo para ser executado?"
+      askSudo: "O gestor de pacotes precisa do sudo para ser executado?"
       askCommand: "Insira o comando para '%s':"
-      askOverwrite: "Um gerenciador de pacotes com o nome '%s' já existe. Sobrescrevê-lo?"
-      askCommandWithDefault: "Digite o comando para '%s' (padrão: '%s'):"
+      askOverwrite: "Um gestor de pacotes com o nome '%s' já existe. Sobrescrevê-lo?"
+      askCommandWithDefault: "Enter the command for '%s' (default: '%s'):"
     options:
       noPrompt:
         description: "Assuma sim para todas as solicitações."
       name:
-        description: "O nome do gerenciador de pacotes."
+        description: "O nome do gestor de pacotes."
       needSudo:
-        description: "Se o gerenciador de pacotes precisa do sudo para ser executado."
+        description: "Se o gestor de pacotes precisa do sudo para ser executado."
       autoremove:
         description: "O comando a ser executado para a remoção automática de pacotes."
       clean:
-        description: "O comando a ser executado para limpar o cache do gerenciador
-          de pacotes."
+        description: "O comando a ser executado para limpar o cache do gestor de pacotes."
       install:
         description: "O comando a ser executado para instalar pacotes."
       list:
@@ -164,54 +163,53 @@ pkgmanagers:
       upgrade:
         description: "O comando a ser executado para atualizar pacotes."
     success: Gerenciador de pacotes %s criado com sucesso.
+  update:
+    description: "Atualize o gestor de pacotes especificado."
+    info:
+      success: "Gestor de pacotes atualizado '%s'."
+      askNewCommand: "Entre o novo comando para %s (Deixe vazio para manter '%s'):"
+    error:
+      noName: Nenhum nome especificado.
+      missingCommand: Comando faltante para %s.
+      builtIn: Built-in package managers cannot be modified.
   rm:
-    description: "Remover o gerenciador de pacotes especificado."
+    description: "Remover o gestor de pacotes especificado."
 
     error:
       noName: "Nenhum nome especificado."
-      inUse: "O gerenciador de pacotes é utilizado em %d pilhas:"
+      inUse: "O gestor de pacotes é utilizado em %d pilhas:"
     info:
-      askConfirmation: "Você tem certeza que deseja remover '%s'?"
-      success: "Gerenciador de pacotes '%s' removido."
-      aborting: Abortando a remoção do gerenciador de pacotes '%s'.
+      askConfirmation: "Tem certeza que deseja remover '%s'?"
+      success: "Gestor de pacotes '%s' removido."
+      aborting: "A abortar a remoção do gestor de pacotes '%s'."
     options:
       force:
-        description: "Forçar a remoção do gerenciador de pacotes."
+        description: "Forçar a remoção do gestor de pacotes."
       name:
-        description: "O nome do gerenciador de pacotes a ser removido."
-
+        description: "O nome do gestor de pacotes a ser removido."
   export:
+    description: "Exporte o gestor de pacotes especificado."
+    error:
+      noName: "Nenhum nome especificado."
+      noOutput: "Nenhuma saída especificada."
+    info:
+      success: "Gestor de pacotes exportados '%s' até '%s'."
     options:
-      output:
-        description: O caminho para exportar o gerenciador de pacotes.
       name:
-        description: O nome do gerenciador de pacotes a ser exportado.
-    error:
-      noOutput: Nenhuma saída especificada.
-      noName: Nenhum nome especificado.
-    description: Exporte o gerenciador de pacotes especificado.
-    info:
-      success: Gerenciador de pacotes exportados '%s' até '%s'.
+        description: "O nome do gestor de pacotes a ser exportado."
+      output:
+        description: "O caminho para exportar o gestor de pacotes."
   import:
+    description: "Importe o gestor de pacotes especificado."
     error:
-      noInput: Nenhuma entrada especificada.
-      cannotLoad: Não é possível carregar o gerenciador de pacotes de '%s'.
+      noInput: "Nenhuma entrada especificada."
+      cannotLoad: "Não é possível carregar o gestor de pacotes de '%s'."
     info:
-      success: Gerenciador de pacotes importado de '%s'.
-    description: Importe o gerenciador de pacotes especificado.
+      success: "Gestor de pacotes importado de '%s'."
     options:
       input:
-        description: O caminho para importar o gerenciador de pacotes.
-  update:
-    description: Atualize o gerenciador de pacotes especificado.
-    info:
-      success: Gerenciador de pacotes atualizado '%s'.
-      askNewCommand: "Digite um novo comando para '%s' (deixe em branco para manter
-        '%s'):"
-    error:
-      noName: Nenhum nome foi especificado.
-      missingCommand: Comando não encontrado para %s.
-      builtIn: Gerenciadores de pacotes integrados não podem ser modificados.
+        description: "O caminho para importar o gestor de pacotes."
+
 stacks:
   description: "Trabalhar com as pilhas que estão disponíveis no apx."
   labels:
@@ -224,7 +222,7 @@ stacks:
       noStacks: "Não há pilhas disponíveis. Crie uma nova com 'apx stacks new' ou
         entre em contato com o administrador do sistema."
       foundStacks: "Encontrou %d pilhas:"
-      aborting: Abortando a remoção da pilha '%s'.
+      aborting: "A abortar a remoção da pilha '%s'."
     options:
       json:
         description: "Saída em formato JSON."
@@ -237,23 +235,22 @@ stacks:
       noName: "Nenhum nome especificado."
       emptyBase: "A base não pode ser vazia."
       noBase: "Nenhuma base especificada."
-      emptyPkgManager: "O gerenciador de pacotes não pode ser vazio."
-      noPkgManager: "Nenhum gerenciador de pacotes especificado."
-      pkgManagerDoesNotExist: "O gerenciador de pacotes especificado não existe. Crie-o
+      emptyPkgManager: "O gestor de pacotes não pode ser vazio."
+      noPkgManager: "Nenhum gestor de pacotes especificado."
+      pkgManagerDoesNotExist: "O gestor de pacotes especificado não existe. Crie-o
         com 'apx pkgmanagers new' ou entre em contato com o administrador do sistema."
       emptyPackages: "Os pacotes não podem estar vazios."
       noPackages: "Não há pacotes especificados."
       alreadyExists: "Já existe uma pilha com o nome '%s'."
-      noPkgManagers: Não foi possível encontrar nenhum gerenciador de pacotes. Tente
-        criar um com 'apx pkgmanagers new' ou entre em contato com o administrador
-        do sistema.
+      noPkgManagers: Não foi possível encontrar nenhum gerenciador de pacotes. Crie
+        um com 'apx pkgmanagers new' ou contate o administrador do sistema
     info:
       askName: "Escolha um nome:"
       askBase: "Escolha uma base (por exemplo, 'vanillaos/pico'):"
-      askPkgManager: "Escolha um gerenciador de pacotes:"
-      selectPkgManager: "Selecione um gerenciador de pacotes [1-%d]:"
-      noPackages: "Você não forneceu nenhum pacote para instalar na pilha. Deseja
-        adicionar algum?"
+      askPkgManager: "Escolha um gestor de pacotes:"
+      selectPkgManager: "Selecione um gestor de pacotes [1-%d]:"
+      noPackages: "Não forneceu nenhum pacote para instalar na pilha. Deseja adicionar
+        algum agora?"
       confirmPackages: "Deseja confirmar a lista de pacotes atual?"
       askPackages: "Digite os pacotes que deseja instalar na pilha, separados por
         um espaço:"
@@ -269,26 +266,26 @@ stacks:
       packages:
         description: "Os pacotes a serem instalados."
       pkgManager:
-        description: "O gerenciador de pacotes a ser usado."
+        description: "O gestor de pacotes a ser usado."
   update:
     description: "Atualizar a pilha especificada."
     error:
       noName: "Nenhum nome especificado."
       noBase: "Nenhuma base especificada."
-      noPkgManager: "Nenhum gerenciador de pacotes especificado."
-      pkgManagerDoesNotExist: "O gerenciador de pacotes especificado não existe. Crie-o
+      noPkgManager: "Nenhum gestor de pacotes especificado."
+      pkgManagerDoesNotExist: "O gestor de pacotes especificado não existe. Crie-o
         com 'apx pkgmanagers new' ou entre em contato com o administrador do sistema."
-      builtIn: Pilhas integradas não podem ser modificadas.
+      builtIn: Built-in stacks cannot be modified.
     info:
       askBase: "Digite uma nova base ou confirme a atual (%s):"
-      askPkgManager: "Escolha um novo gerenciador de pacotes ou confirme o atual (%s):"
+      askPkgManager: "Escolha um novo gestor de pacotes ou confirme o atual (%s):"
       askPackages: "Digite os pacotes que deseja instalar na pilha, separados por
-        um espaço:"
+        um espaço, ou confirme os atuais (%s):"
       success: "Pilha '%s' atualizada."
 
-      confirmPackages: Deseja atualizar a lista de pacotes?
-      noPackages: Você não forneceu nenhum pacote para instalar na pilha. Deseja adicionar
-        algum?
+      confirmPackages: Você confirma a lista de pacotes atuais?
+      noPackages: Você não adicionou nenhum pacote para instalar na pilha. Deseja
+        adicionar algum agora?
     options:
       noPrompt:
         description: "Assuma que sim para todas as solicitações."
@@ -299,12 +296,12 @@ stacks:
       packages:
         description: "Os pacotes a serem instalados."
       pkgManager:
-        description: "O gerenciador de pacotes a ser usado."
+        description: "O gestor de pacotes a ser usado."
   rm:
     description: "Remover a pilha especificada."
     error:
       noName: "Nenhum nome especificado."
-      inUse: 'A pilha é usada em %d subsistemas:'
+      inUse: 'The stack is used in %d subsystems:'
     info:
       askConfirmation: "Tem certeza de que deseja remover '%s'?"
       success: "Pilha '%s' removida."
@@ -340,7 +337,7 @@ subsystems:
   description: "Trabalhe com os subsistemas que estão disponíveis no apx."
   labels:
     name: "Nome"
-    status: "Status"
+    status: "Estado"
 
   list:
     description: "Listar todos os subsistemas disponíveis."
@@ -368,7 +365,7 @@ subsystems:
       askName: "Escolha um nome:"
       selectStack: "Selecione uma pilha [1-%d]:"
       success: "Subsistema '%s' criado."
-      creatingSubsystem: "Criando o subsistema '%s' com a pilha '%s'…"
+      creatingSubsystem: "A criar o subsistema '%s' com a pilha '%s'…"
       availableStacks: 'Pilhas disponíveis:'
     options:
       name:
@@ -376,9 +373,9 @@ subsystems:
       stack:
         description: "A pilha a ser usada."
       home:
-        description: O diretório home customizado do subsistema.
+        description: "O diretório home customizado do subsistema."
       init:
-        description: Use systemd dentro do subsistema.
+        description: "Use systemd dentro do subsistema."
   rm:
     description: "Remover o subsistema especificado."
     error:

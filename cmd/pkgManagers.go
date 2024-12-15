@@ -4,7 +4,7 @@ package cmd
 	Authors:
 		Mirko Brombin <send@mirko.pm>
 		Pietro di Caprio <pietro@fabricators.ltd>
-	Copyright: 2023
+	Copyright: 2024
 	Description: Apx is a wrapper around multiple package managers to install packages and run commands inside a managed container.
 */
 
@@ -17,9 +17,35 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vanilla-os/apx/core"
+	"github.com/vanilla-os/apx/v2/core"
 	"github.com/vanilla-os/orchid/cmdr"
 )
+
+const (
+	PkgManagerCmdAutoRemove = "autoRemove"
+	PkgManagerCmdClean      = "clean"
+	PkgManagerCmdInstall    = "install"
+	PkgManagerCmdList       = "list"
+	PkgManagerCmdPurge      = "purge"
+	PkgManagerCmdRemove     = "remove"
+	PkgManagerCmdSearch     = "search"
+	PkgManagerCmdShow       = "show"
+	PkgManagerCmdUpdate     = "update"
+	PkgManagerCmdUpgrade    = "upgrade"
+)
+
+var PkgManagerCmdSetOrder = []string{
+	PkgManagerCmdInstall,
+	PkgManagerCmdUpdate,
+	PkgManagerCmdRemove,
+	PkgManagerCmdPurge,
+	PkgManagerCmdAutoRemove,
+	PkgManagerCmdClean,
+	PkgManagerCmdList,
+	PkgManagerCmdSearch,
+	PkgManagerCmdShow,
+	PkgManagerCmdUpgrade,
+}
 
 func NewPkgManagersCommand() *cmdr.Command {
 	// Root command
@@ -66,9 +92,9 @@ func NewPkgManagersCommand() *cmdr.Command {
 
 	newCmd.WithBoolFlag(
 		cmdr.NewBoolFlag(
-			"assume-yes",
+			"no-prompt",
 			"y",
-			apx.Trans("pkgmanagers.new.options.assumeYes.description"),
+			apx.Trans("pkgmanagers.new.options.noPrompt.description"),
 			false,
 		),
 	)
@@ -194,11 +220,166 @@ func NewPkgManagersCommand() *cmdr.Command {
 		),
 	)
 
+	// Export subcommand
+	exportCmd := cmdr.NewCommand(
+		"export",
+		apx.Trans("pkgmanagers.export.description"),
+		apx.Trans("pkgmanagers.export.description"),
+		exportPkgmanager,
+	)
+	exportCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"name",
+			"n",
+			apx.Trans("pkgmanagers.export.options.name.description"),
+			"",
+		),
+	)
+	exportCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"output",
+			"o",
+			apx.Trans("stacks.export.options.output.description"),
+			"",
+		),
+	)
+
+	// Import subcommand
+	importCmd := cmdr.NewCommand(
+		"import",
+		apx.Trans("pkgmanagers.import.description"),
+		apx.Trans("pkgmanagers.import.description"),
+		importPkgmanager,
+	)
+	importCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"input",
+			"i",
+			apx.Trans("pkgmanagers.import.options.input.description"),
+			"",
+		),
+	)
+
+	// Update subcommand
+	updateCmd := cmdr.NewCommand(
+		"update",
+		apx.Trans("pkgmanagers.update.description"),
+		apx.Trans("pkgmanagers.update.description"),
+		updatePkgManager,
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"name",
+			"n",
+			apx.Trans("pkgmanagers.new.options.name.description"),
+			"",
+		),
+	)
+	updateCmd.WithBoolFlag(
+		cmdr.NewBoolFlag(
+			"need-sudo",
+			"S",
+			apx.Trans("pkgmanagers.new.options.needSudo.description"),
+			false,
+		),
+	)
+	updateCmd.WithBoolFlag(
+		cmdr.NewBoolFlag(
+			"no-prompt",
+			"y",
+			apx.Trans("pkgmanagers.new.options.noPrompt.description"),
+			false,
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"autoremove",
+			"a",
+			apx.Trans("pkgmanagers.new.options.autoremove.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"clean",
+			"c",
+			apx.Trans("pkgmanagers.new.options.clean.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"install",
+			"i",
+			apx.Trans("pkgmanagers.new.options.install.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"list",
+			"l",
+			apx.Trans("pkgmanagers.new.options.list.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"purge",
+			"p",
+			apx.Trans("pkgmanagers.new.options.purge.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"remove",
+			"r",
+			apx.Trans("pkgmanagers.new.options.remove.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"search",
+			"s",
+			apx.Trans("pkgmanagers.new.options.search.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"show",
+			"w",
+			apx.Trans("pkgmanagers.new.options.show.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"update",
+			"u",
+			apx.Trans("pkgmanagers.new.options.update.description"),
+			"",
+		),
+	)
+	updateCmd.WithStringFlag(
+		cmdr.NewStringFlag(
+			"upgrade",
+			"U",
+			apx.Trans("pkgmanagers.new.options.upgrade.description"),
+			"",
+		),
+	)
+
 	// Add subcommands to pkgmanagers
 	cmd.AddCommand(listCmd)
 	cmd.AddCommand(showCmd)
 	cmd.AddCommand(newCmd)
 	cmd.AddCommand(rmCmd)
+	cmd.AddCommand(exportCmd)
+	cmd.AddCommand(importCmd)
+	cmd.AddCommand(updateCmd)
 
 	return cmd
 }
@@ -264,7 +445,7 @@ func showPkgManager(cmd *cobra.Command, args []string) error {
 }
 
 func newPkgManager(cmd *cobra.Command, args []string) error {
-	assumeYes, _ := cmd.Flags().GetBool("assume-yes")
+	noPrompt, _ := cmd.Flags().GetBool("no-prompt")
 	name, _ := cmd.Flags().GetString("name")
 	needSudo, _ := cmd.Flags().GetBool("need-sudo")
 	autoRemove, _ := cmd.Flags().GetString("autoremove")
@@ -281,7 +462,7 @@ func newPkgManager(cmd *cobra.Command, args []string) error {
 	reader := bufio.NewReader(os.Stdin)
 
 	if name == "" {
-		if assumeYes {
+		if noPrompt {
 			cmdr.Error.Println(apx.Trans("pkgmanagers.new.error.noName"))
 			return nil
 		}
@@ -296,7 +477,7 @@ func newPkgManager(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if !needSudo && !assumeYes {
+	if !needSudo && !noPrompt {
 		validChoice := false
 		for !validChoice {
 			cmdr.Info.Println(apx.Trans("pkgmanagers.new.info.askSudo") + ` [y/N]`)
@@ -319,23 +500,33 @@ func newPkgManager(cmd *cobra.Command, args []string) error {
 	}
 
 	cmdMap := map[string]*string{
-		"autoRemove": &autoRemove,
-		"clean":      &clean,
-		"install":    &install,
-		"list":       &list,
-		"purge":      &purge,
-		"remove":     &remove,
-		"search":     &search,
-		"show":       &show,
-		"update":     &update,
-		"upgrade":    &upgrade,
+		PkgManagerCmdAutoRemove: &autoRemove,
+		PkgManagerCmdClean:      &clean,
+		PkgManagerCmdInstall:    &install,
+		PkgManagerCmdList:       &list,
+		PkgManagerCmdPurge:      &purge,
+		PkgManagerCmdRemove:     &remove,
+		PkgManagerCmdSearch:     &search,
+		PkgManagerCmdShow:       &show,
+		PkgManagerCmdUpdate:     &update,
+		PkgManagerCmdUpgrade:    &upgrade,
 	}
 
-	for cmdName, cmd := range cmdMap {
+	for _, cmdName := range PkgManagerCmdSetOrder {
+		cmd := cmdMap[cmdName]
 		if *cmd == "" {
-			if assumeYes {
+			if noPrompt {
 				cmdr.Error.Printf(apx.Trans("pkgmanagers.new.error.noCommand"), cmdName)
 				return nil
+			}
+			if cmdName == PkgManagerCmdPurge || cmdName == PkgManagerCmdAutoRemove {
+				cmdr.Info.Printfln(apx.Trans("pkgmanagers.new.info.askCommandWithDefault"), cmdName, remove)
+				*cmd, _ = reader.ReadString('\n')
+				*cmd = strings.ReplaceAll(*cmd, "\n", "")
+				if *cmd == "" {
+					*cmd = remove
+				}
+				continue
 			}
 
 			cmdr.Info.Printfln(apx.Trans("pkgmanagers.new.info.askCommand"), cmdName)
@@ -349,7 +540,7 @@ func newPkgManager(cmd *cobra.Command, args []string) error {
 	}
 
 	if core.PkgManagerExists(name) {
-		if assumeYes {
+		if noPrompt {
 			cmdr.Error.Println(apx.Trans("pkgmanagers.new.error.alreadyExists"), name)
 			return nil
 		}
@@ -439,5 +630,272 @@ func rmPkgManager(cmd *cobra.Command, args []string) error {
 	}
 
 	cmdr.Info.Printfln(apx.Trans("pkgmanagers.rm.info.success"), pkgManagerName)
+	return nil
+}
+
+func exportPkgmanager(cmd *cobra.Command, args []string) error {
+	pkgManagerName, _ := cmd.Flags().GetString("name")
+	if pkgManagerName == "" {
+		cmdr.Error.Println(apx.Trans("pkgmanagers.export.error.noName"))
+		return nil
+	}
+
+	pkgManager, error := core.LoadPkgManager(pkgManagerName)
+	if error != nil {
+		return error
+	}
+
+	output, _ := cmd.Flags().GetString("output")
+	if output == "" {
+		cmdr.Error.Println(apx.Trans("pkgmanagers.export.error.noOutput"))
+		return nil
+	}
+
+	error = pkgManager.Export(output)
+	if error != nil {
+		return error
+	}
+
+	cmdr.Info.Printfln(apx.Trans("pkgmanagers.export.info.success"), pkgManager.Name, output)
+	return nil
+}
+
+func importPkgmanager(cmd *cobra.Command, args []string) error {
+	input, _ := cmd.Flags().GetString("input")
+	if input == "" {
+		cmdr.Error.Println(apx.Trans("pkgmanagers.import.error.noInput"))
+		return nil
+	}
+
+	pkgmanager, error := core.LoadPkgManagerFromPath(input)
+	if error != nil {
+		cmdr.Error.Printf(apx.Trans("pkgmanagers.import.error.cannotLoad"), input)
+	}
+
+	error = pkgmanager.Save()
+	if error != nil {
+		return error
+	}
+
+	cmdr.Info.Printfln(apx.Trans("pkgmanagers.import.info.success"), pkgmanager.Name)
+	return nil
+}
+
+func updatePkgManager(cmd *cobra.Command, args []string) error {
+	name, _ := cmd.Flags().GetString("name")
+	needSudo, _ := cmd.Flags().GetBool("need-sudo")
+	noPrompt, _ := cmd.Flags().GetBool("no-prompt")
+	autoRemove, _ := cmd.Flags().GetString("autoremove")
+	clean, _ := cmd.Flags().GetString("clean")
+	install, _ := cmd.Flags().GetString("install")
+	list, _ := cmd.Flags().GetString("list")
+	purge, _ := cmd.Flags().GetString("purge")
+	remove, _ := cmd.Flags().GetString("remove")
+	search, _ := cmd.Flags().GetString("search")
+	show, _ := cmd.Flags().GetString("show")
+	update, _ := cmd.Flags().GetString("update")
+	upgrade, _ := cmd.Flags().GetString("upgrade")
+
+	if name == "" {
+		if len(args) != 1 || args[0] == "" {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.noName"))
+			return nil
+		}
+
+		cmd.Flags().Set("name", args[0])
+		name = args[0]
+	}
+
+	pkgmanager, error := core.LoadPkgManager(name)
+	if error != nil {
+		return error
+	}
+
+	if pkgmanager.BuiltIn {
+		cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.builtIn"))
+		os.Exit(126)
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+
+	if autoRemove == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "autoRemove", pkgmanager.CmdAutoRemove)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				autoRemove = pkgmanager.CmdAutoRemove
+			} else {
+				autoRemove = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "autoRemove")
+			return nil
+		}
+	}
+
+	if clean == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "clean", pkgmanager.CmdClean)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				clean = pkgmanager.CmdClean
+			} else {
+				clean = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "clean")
+			return nil
+		}
+	}
+
+	if install == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "install", pkgmanager.CmdInstall)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				install = pkgmanager.CmdInstall
+			} else {
+				install = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "install")
+			return nil
+		}
+	}
+
+	if list == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "list", pkgmanager.CmdList)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				list = pkgmanager.CmdList
+			} else {
+				list = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "list")
+			return nil
+		}
+	}
+
+	if purge == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "purge", pkgmanager.CmdPurge)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				purge = pkgmanager.CmdPurge
+			} else {
+				purge = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "purge")
+			return nil
+		}
+	}
+
+	if remove == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "remove", pkgmanager.CmdRemove)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				remove = pkgmanager.CmdRemove
+			} else {
+				remove = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "remove")
+			return nil
+		}
+	}
+
+	if search == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "search", pkgmanager.CmdSearch)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				search = pkgmanager.CmdSearch
+			} else {
+				search = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "search")
+			return nil
+		}
+	}
+
+	if show == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "show", pkgmanager.CmdShow)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				show = pkgmanager.CmdShow
+			} else {
+				show = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "show")
+			return nil
+		}
+	}
+
+	if update == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "update", pkgmanager.CmdUpdate)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				update = pkgmanager.CmdUpdate
+			} else {
+				update = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "update")
+			return nil
+		}
+	}
+
+	if upgrade == "" {
+		if !noPrompt {
+			cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.askNewCommand"), "upgrade", pkgmanager.CmdUpgrade)
+			answer, _ := reader.ReadString('\n')
+			answer = strings.TrimSpace(answer)
+			if answer == "" {
+				upgrade = pkgmanager.CmdUpgrade
+			} else {
+				upgrade = answer
+			}
+		} else {
+			cmdr.Error.Println(apx.Trans("pkgmanagers.update.error.missingCommand"), "upgrade")
+			return nil
+		}
+	}
+
+	pkgmanager.NeedSudo = needSudo
+	pkgmanager.CmdAutoRemove = autoRemove
+	pkgmanager.CmdClean = clean
+	pkgmanager.CmdInstall = install
+	pkgmanager.CmdList = list
+	pkgmanager.CmdPurge = purge
+	pkgmanager.CmdRemove = remove
+	pkgmanager.CmdSearch = search
+	pkgmanager.CmdShow = show
+	pkgmanager.CmdUpdate = update
+	pkgmanager.CmdUpgrade = upgrade
+
+	err := pkgmanager.Save()
+	if err != nil {
+		return err
+	}
+
+	cmdr.Info.Printfln(apx.Trans("pkgmanagers.update.info.success"), name)
+
 	return nil
 }

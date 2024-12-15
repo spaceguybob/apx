@@ -5,12 +5,25 @@ apx:
     unknownCommand: "Okänt kommando: %s"
     invalidInput: "Ogiltig inmatning."
     invalidChoice: Ogiltigt val.
+    noRoot: Kör inte Apx som root
   info:
     aborting: "Avbryter som begärt."
   terminal:
     yes: "ja"
     no: "nej"
 
+  msg:
+    aliases: Aliaser
+    usage: Användning
+    version: Visa version av apx.
+    help: Visa hjälp för apx.
+    examples: Exempel
+    moreInfo: Använd %s för mer information om ett kommando
+    flags: Flaggor
+    additionalCommands: Ytterligare kommandon
+    availableCommands: Tillgängliga kommandon
+    globalFlags: Globala flaggor
+    additionalHelpTopics: Ytterligare hjälpämnen
 runtimeCommand:
   description: "Arbeta med det angivna undersystemet, åtkomst till pakethanteraren
     och miljön."
@@ -19,18 +32,25 @@ runtimeCommand:
     cantAccessPkgManager: "Ett fel uppstod vid åtkomst till pakethanteraren: %s"
     executingCommand: "Ett fel uppstod när kommandot: %s kördes"
     noAppNameOrBin: "--app-name eller --bin måste anges."
-    sameAppOrBin: "--app-name och --bin kan inte anges båda."
-    exportingApp: "Ett fel uppstod vid export av programmet: %s"
+    sameAppOrBin: "--app-name och --bin kan inte båda specificeras."
+    exportingApp: "Ett fel uppstod vid export av program: %s"
     exportingBin: "Ett fel inträffade vid export av binär: %s"
     unexportingApp: "Ett fel uppstod när programmet skulle avexporteras: %s"
     unexportingBin: "Ett fel uppstod när binär: %s skulle avexporteras"
+    enteringContainer: 'Ett fel uppstod när du gick in i behållaren: %s'
+    startingContainer: 'Ett fel uppstod då behållaren skulle köras: %s'
+    stoppingContainer: 'Ett fel uppstod då behållaren skulle stoppas: %s'
   info:
-    unexportedApps: "Oexporterade %d program\n"
-    exportedApps: "Exporterade %d program\n"
-    exportedApp: "Exporterat program %s\n"
-    exportedBin: "Exporterad binär %s\n"
-    unexportedApp: "Oexporterat program %s\n"
-    unexportedBin: "Oexporterad binär %s\n"
+    unexportedApps: "Oexporterade %d program"
+    exportedApps: "Exporterade %d program"
+    exportedApp: "Exporterat program %s"
+    exportedBin: "Exporterad binär %s"
+    unexportedApp: "Oexporterat program %s"
+    unexportedBin: "Oexporterad binär %s"
+    stoppedContainer: Stoppade undersystem.
+    startedContainer: Startade undersystem.
+    stoppingContainer: Stoppar undersystem %s…
+    startingContainer: Startar undersystem %s…
   autoremove:
     description: "Ta bort paket som inte längre behövs."
   clean:
@@ -57,7 +77,7 @@ runtimeCommand:
   enter:
     description: "Gå in i undersystems miljö"
   export:
-    description: "Exportera ett program eller binär från undersystemet."
+    description: "Exportera ett program eller binär från undersystemet till värden."
     options:
       appName:
         description: "Namnet på programmet som ska exporteras."
@@ -66,7 +86,7 @@ runtimeCommand:
       binOutput:
         description: "Sökvägen av binär utdata (standard: ~/.local/bin/)."
   unexport:
-    description: "Avexportera ett program eller binär från undersystemet."
+    description: "Avexportera ett program eller binär från värden."
     options:
       appName:
         description: "Namnet på programmet att avexportera."
@@ -75,6 +95,12 @@ runtimeCommand:
       binOutput:
         description: "Sökväg av binär utdata (standard: ~/.local/bin/)."
 
+  start:
+    description: Starta undersystem.
+  stop:
+    description: Stoppa undersystem.
+  run:
+    description: Kör kommando inuti undersystem.
 pkgmanagers:
   description: "Arbeta med de pakethanterare som finns tillgängliga i apx."
   labels:
@@ -86,7 +112,7 @@ pkgmanagers:
     info:
       noPkgManagers: "Inga pakethanterare tillgängliga. Skapa en ny med 'apx pkgmanagers
         new' eller kontakta systemadministratören."
-      foundPkgManagers: "Hittade %d pakethanterare:\n"
+      foundPkgManagers: "Hittade %d pakethanterare:"
     options:
       json:
         description: "Utdata i JSON format."
@@ -107,9 +133,9 @@ pkgmanagers:
       askCommand: "Ange kommandot för '%s':"
       askOverwrite: "En pakethanterare med namnet '%s' finns redan. Vill du skriva
         över det?"
-      success: "Skapade pakethanterare '%s'."
+      askCommandWithDefault: "Ange kommando för '%s' (standard: '%s'):"
     options:
-      assumeYes:
+      noPrompt:
         description: "Anta ja till alla uppmaningar."
       name:
         description: "Namnet på pakethanteraren."
@@ -136,12 +162,13 @@ pkgmanagers:
           paket."
       upgrade:
         description: "Kommandot att köra för att uppgradera paket."
+    success: Pakethanteraren %s skapades framgångsrikt.
   rm:
     description: "Ta bort den specificerade pakethanteraren."
 
     error:
       noName: "Inget namn specificerat."
-      inUse: "Pakethanteraren används i %d stackar:\n"
+      inUse: "Pakethanteraren används i %d stackar:"
     info:
       askConfirmation: "Är du säker på att du vill ta bort '%s'?"
       success: "Tog bort pakethanterare '%s'."
@@ -152,6 +179,37 @@ pkgmanagers:
       name:
         description: "Namnet på pakethanteraren som ska tas bort."
 
+  export:
+    options:
+      output:
+        description: Sökvägen att exportera pakethanterare till.
+      name:
+        description: Namnet på pakethanterare som ska exporteras.
+    error:
+      noOutput: Ingen utgång specificerad.
+      noName: Inget namn specificerat.
+    description: Exportera den angivna pakethanteraren.
+    info:
+      success: Exporterade pakethanterare '%s' till '%s'.
+  import:
+    error:
+      noInput: Ingen inmatning specificerad.
+      cannotLoad: Kan inte ladda pakethanterare från '%s'.
+    info:
+      success: Importerade pakethanterare från '%s'.
+    description: Importera den specificerade pakethanteraren.
+    options:
+      input:
+        description: Sökvägen som pakethanteraren ska importeras från.
+  update:
+    description: Uppdatera den specificerade pakethanteraren.
+    info:
+      success: Uppdaterade pakethanterare "%s".
+      askNewCommand: "Ange nytt kommando för '%s' (lämna tomt för att behålla '%s':"
+    error:
+      noName: Inget namn specificerat
+      missingCommand: Saknar kommando för %s.
+      builtIn: Inbyggda pakethanterare kan inte modifieras.
 stacks:
   description: "Arbeta med de stackar som finns tillgängliga i apx."
   labels:
@@ -163,7 +221,7 @@ stacks:
     info:
       noStacks: "Inga stackar tillgängliga. Skapa en ny med 'apx stack new' eller
         kontakta systemadministratören."
-      foundStacks: "Hittade %d stackar:\n"
+      foundStacks: "Hittade %d stackar:"
       aborting: Avbryter borttagning av stack '%s'.
     options:
       json:
@@ -184,6 +242,8 @@ stacks:
       emptyPackages: "Paketen kan inte vara tomma."
       noPackages: "Inga paket specificerade."
       alreadyExists: "En stack med namnet '%s' existerar redan."
+      noPkgManagers: Kunde inte hitta någon pakethanterare. Skapa en med 'apx pkgmanagers
+        new' eller kontakta systemadministratören.
     info:
       askName: "Välj ett namn:"
       askBase: "Välj en bas (t.e.x. 'vanillaos/pico'):"
@@ -196,12 +256,13 @@ stacks:
         av ett mellanslag:"
       success: "Skapade stack '%s'."
     options:
-      assumeYes:
+      noPrompt:
         description: "Anta ja till alla uppmaningar."
       name:
         description: "Namnet på stacken."
       base:
-        description: "Bas undersystem att använda."
+        description: "Basdistributionsavbilden som ska användas. (För en lista över
+          kompatibla avbilder se: https://distrobox.it/compatibility/#containers-distros)"
       packages:
         description: "Paketen att installera."
       pkgManager:
@@ -214,15 +275,19 @@ stacks:
       noPkgManager: "Ingen pakethanterare specificerad."
       pkgManagerDoesNotExist: "Den specificerade pakethanteraren finns inte. Skapa
         den med 'apx pkgmanagers new' eller kontakta systemadministratören."
+      builtIn: Inbyggda stackar kan inte modifieras.
     info:
       askBase: "Skriv en ny bas eller bekräfta den nuvarande (%s):"
       askPkgManager: "Välj en ny pakethanterare eller bekräfta den nuvarande (%s):"
-      askPackages: "Skriv in de paket du vill installera i stacken, åtskilda av ett
-        mellanslag, eller bekräfta de aktuella (%s):"
+      askPackages: "Skriv in de paketen du vill installera i stacken, åtskilda av
+        ett mellanslag:"
       success: "Uppdaterad stack '%s'."
 
+      confirmPackages: Vill du uppdatera listan över paket?
+      noPackages: Du har inte tillhandahållit några paket att installera i stacken.
+        Vill du lägga till några nu?
     options:
-      assumeYes:
+      noPrompt:
         description: "Anta ja till alla uppmaningar."
       name:
         description: "Namnet på stacken."
@@ -236,6 +301,7 @@ stacks:
     description: "Ta bort den specificerade stacken."
     error:
       noName: "Inget namn specificerat."
+      inUse: 'Stacken används i %d delsystem:'
     info:
       askConfirmation: "Är du säker på att du vill ta bort '%s'?"
       success: "Tog bort stack '%s'."
@@ -279,7 +345,7 @@ subsystems:
     info:
       noSubsystems: "Inga undersystem tillgänliga. Skapa ett nytt med 'apx subsystems
         new' eller kontakta systemadministratören."
-      foundSubsystems: "Hittade %d undersystem:\n"
+      foundSubsystems: "Hittade %d undersystem:"
     options:
       json:
         description: "Utdata i JSON-format."
@@ -299,12 +365,17 @@ subsystems:
       askName: "Välj ett namn:"
       selectStack: "Välj en stack [1-%d]:"
       success: "Skapade undersystem '%s'."
-      creatingSubsystem: "Skapade undersystem '%s' med stack '%s'…"
+      creatingSubsystem: "Skapar undersystem '%s' med stack '%s'…"
+      availableStacks: 'Tillgängliga stackar:'
     options:
       name:
         description: "Namnet på undersystem."
       stack:
         description: "Stacken att använda."
+      home:
+        description: Den anpassade hemkatalogen för undersystemet.
+      init:
+        description: Använd systemd inuti undersystem.
   rm:
     description: "Ta bort det specificerade undersystemet."
     error:

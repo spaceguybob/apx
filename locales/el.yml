@@ -5,12 +5,25 @@ apx:
     unknownCommand: "Άγνωστη εντολή: %s"
     invalidInput: "Μη έγκυρη είσοδος."
     invalidChoice: "Μη έγκυρη επιλογή."
+    noRoot: Do not run Apx as root.
   info:
     aborting: "Πραγματοποιείται ματαίωση, όπως ζητήθηκε."
   terminal:
     yes: "ναι"
     no: "όχι"
 
+  msg:
+    help: Show help for apx.
+    examples: Examples
+    aliases: Aliases
+    usage: Usage
+    moreInfo: Use %s for more information about a command
+    flags: Flags
+    additionalCommands: Additional Commands
+    availableCommands: Available Commands
+    version: Show version for apx.
+    globalFlags: Global Flags
+    additionalHelpTopics: Additional help topics
 runtimeCommand:
   description: "Εργαστείτε στο επιλεγμένο υποσύστημα, με πρόσβαση στον διαχειριστή
     πακέτων και στο περιβάλλον."
@@ -27,6 +40,9 @@ runtimeCommand:
     unexportingApp: "Προέκυψε ένα σφάλμα κατά την άρση εξαγωγής της εφαρμογής: %s"
     unexportingBin: "Προέκυψε ένα σφάλμα κατά την άρση εξαγωγής του εκτελέσιμου αρχείου:
       %s"
+    enteringContainer: 'An error occurred while entering the container: %s'
+    startingContainer: 'An error occurred while starting the container: %s'
+    stoppingContainer: 'An error occurred while stopping the container: %s'
   info:
     unexportedApps: "Ήρθη η εξαγωγή %d εφαρμογών"
     exportedApps: "Εξήχθησαν %d εφαρμογές"
@@ -34,6 +50,10 @@ runtimeCommand:
     exportedBin: "Εξήχθη το εκτελέσιμο αρχείο %s"
     unexportedApp: "Ήρθη η εξαγωγή της εφαρμογής %s"
     unexportedBin: "Ήρθη η εξαγωγή του εκτελέσιμου αρχείου %s"
+    stoppedContainer: Stopped container.
+    startedContainer: Started container.
+    stoppingContainer: Stopping container…
+    startingContainer: Starting container…
   autoremove:
     description: "Αφαίρεση πακέτων που δεν χρειάζονται πλέον."
   clean:
@@ -80,6 +100,12 @@ runtimeCommand:
         description: "Η διαδρομή για την εξαγωγή του εκτελέσιμου αρχείου (Προεπιλεγμένη:
           ~/.local/bin/)."
 
+  start:
+    description: Start the subsystem.
+  stop:
+    description: Stop the subsystem.
+  run:
+    description: Run command inside subsystem.
 pkgmanagers:
   description: "Εργαστείτε με τους διαθέσιμους διαχειριστές πακέτων στο apx."
   labels:
@@ -111,9 +137,9 @@ pkgmanagers:
       askSudo: "Χρειάζεται το sudo για να τρέξει ο διαχειριστής πακέτων;"
       askCommand: "Εισαγωγή εντολής για '%s':"
       askOverwrite: "Ένας διαχειριστής πακέτων με το όνομα '%s' υπάρχει ήδη. Να επεγγραφεί;"
-      success: "Δημιουργήθηκε ο διαχειριστής πακέτων '%s'."
+      askCommandWithDefault: "Enter the command for '%s' (default: '%s'):"
     options:
-      assumeYes:
+      noPrompt:
         description: "Να θεωρηθεί το \"ναι\" ως απάντηση σε κάθε προτροπή."
       name:
         description: "Το όνομα του διαχειριστή πακέτων."
@@ -140,6 +166,7 @@ pkgmanagers:
         description: "Η εντολή για την ενημέρωση της καταγραφής των διαθέσιμων πακέτων."
       upgrade:
         description: "Η εντολή για την αναβάθμιση των πακέτων."
+    success: Package manager %s created successfully.
   rm:
     description: "Αφαίρεση του επιλεγμένου διαχειριστή πακέτων."
 
@@ -156,6 +183,37 @@ pkgmanagers:
       name:
         description: "Το όνομα του διαχειριστή πακέτων που να αφαιρεθεί."
 
+  export:
+    options:
+      output:
+        description: The path to export the package manager to.
+      name:
+        description: The name of the package manager to export.
+    error:
+      noOutput: No output specified.
+      noName: No name specified.
+    description: Export the specified package manager.
+    info:
+      success: Exported package manager '%s' to '%s'.
+  import:
+    error:
+      noInput: No input specified.
+      cannotLoad: Cannot load package manager from '%s'.
+    info:
+      success: Imported package manager from '%s'.
+    description: Import the specified package manager.
+    options:
+      input:
+        description: The path to import the package manager from.
+  update:
+    description: Update the specified package manager.
+    info:
+      success: Updated package manager '%s'.
+      askNewCommand: "Enter new command for '%s' (leave empty to keep '%s'):"
+    error:
+      noName: No name specified.
+      missingCommand: Missing command for %s.
+      builtIn: Built-in package managers cannot be modified.
 stacks:
   description: "Εργαστείτε με τις διαθέσιμες στοίβες στο apx."
   labels:
@@ -188,6 +246,8 @@ stacks:
       emptyPackages: "Τα πακέτα δεν μπορεί να είναι κενά."
       noPackages: "Δεν καθορίστηκαν πακέτα."
       alreadyExists: "Υπάρχει ήδη μια στοίβα με το όνομα '%s'."
+      noPkgManagers: Could not find any package managers. Create one with 'apx pkgmanagers
+        new' or contact the system administrator.
     info:
       askName: "Επιλογή ονόματος:"
       askBase: "Επιλογή μιας βάσης (π.χ. 'vanillaos/pico'):"
@@ -200,7 +260,7 @@ stacks:
         στη στοίβα, χωρισμένα με κενό:"
       success: "Δημιουργήθηκε η στοίβα '%s'."
     options:
-      assumeYes:
+      noPrompt:
         description: "Να θεωρηθεί το \"ναι\" ως απάντηση σε κάθε προτροπή."
       name:
         description: "Το όνομα της στοίβας."
@@ -218,6 +278,7 @@ stacks:
       noPkgManager: "Δεν καθορίστηκε διαχειριστής πακέτων."
       pkgManagerDoesNotExist: "Ο επιλεγμένος διαχειριστής πακέτων δεν υπάρχει. Δημιουργήστε
         τον με το 'apx pkgmanagers new' ή επικοινωνήστε με τον διαχειριστή του συστήματος."
+      builtIn: Built-in stacks cannot be modified.
     info:
       askBase: "Πληκτρολογήστε μια νέα βάση ή επιβεβαιώστε τη τρέχουσα (%s):"
       askPkgManager: "Επιλέξτε έναν νέο διαχειριστή πακέτων ή επιβεβαιώστε τον τρέχοντα
@@ -226,8 +287,11 @@ stacks:
         χωρισμένα με κενό, ή επιβεβαιώστε τα τρέχοντα (%s):"
       success: "Ενημερώθηκε η στοίβα '%s'."
 
+      noPackages: You have not provided any packages to install in the stack. Do you
+        want to add some now?
+      confirmPackages: Do you want to confirm the current packages list?
     options:
-      assumeYes:
+      noPrompt:
         description: "Να θεωρηθεί το \"ναι\" ως απάντηση σε κάθε προτροπή."
       name:
         description: "Το όνομα της στοίβας."
@@ -241,6 +305,7 @@ stacks:
     description: "Αφαίρεση της επιλεγμένης στοίβας."
     error:
       noName: "Δεν καθορίστηκε όνομα."
+      inUse: 'The stack is used in %d subsystems:'
     info:
       askConfirmation: "Είστε σίγουροι πως επιθυμείτε την αφαίρεση του '%s'; [y/N]"
       success: "Αφαιρέθηκε η στοίβα '%s'."
@@ -305,11 +370,16 @@ subsystems:
       selectStack: "Επιλέξτε μια στοίβα [1-%d]:"
       success: "Δημιουργήθηκε το υποσύστημα '%s'."
       creatingSubsystem: "Δημιουργήθηκε το υποσύστημα '%s' με τη στοίβα '%s'…"
+      availableStacks: 'Available stacks:'
     options:
       name:
         description: "Το όνομα του υποσυστήματος."
       stack:
         description: "Η στοίβα που θα χρησιμοποιηθεί."
+      home:
+        description: The custom home directory of the subsystem.
+      init:
+        description: Use systemd inside the subsystem.
   rm:
     description: "Αφαίρεση του επιλεγμένου υποσυστήματος."
     error:

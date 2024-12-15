@@ -4,7 +4,7 @@ package cmd
 	Authors:
 		Mirko Brombin <send@mirko.pm>
 		Pietro di Caprio <pietro@fabricators.ltd>
-	Copyright: 2023
+	Copyright: 2024
 	Description: Apx is a wrapper around multiple package managers to install packages and run commands inside a managed container.
 */
 
@@ -17,7 +17,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vanilla-os/apx/core"
+	"github.com/vanilla-os/apx/v2/core"
 	"github.com/vanilla-os/orchid/cmdr"
 )
 
@@ -65,9 +65,9 @@ func NewStacksCommand() *cmdr.Command {
 	)
 	newCmd.WithBoolFlag(
 		cmdr.NewBoolFlag(
-			"assume-yes",
+			"no-prompt",
 			"y",
-			apx.Trans("stacks.new.options.assumeYes.description"),
+			apx.Trans("stacks.new.options.noPrompt.description"),
 			false,
 		),
 	)
@@ -113,9 +113,9 @@ func NewStacksCommand() *cmdr.Command {
 	)
 	updateCmd.WithBoolFlag(
 		cmdr.NewBoolFlag(
-			"assume-yes",
+			"no-prompt",
 			"y",
-			apx.Trans("stacks.update.options.assumeYes.description"),
+			apx.Trans("stacks.update.options.noPrompt.description"),
 			false,
 		),
 	)
@@ -237,11 +237,11 @@ func listStacks(cmd *cobra.Command, args []string) error {
 	if !jsonFlag {
 		stacksCount := len(stacks)
 		if stacksCount == 0 {
-			fmt.Println(apx.Trans("stacks.list.noStacks"))
+			fmt.Println(apx.Trans("stacks.list.info.noStacks"))
 			return nil
 		}
 
-		fmt.Printf(apx.Trans("stacks.list.info.foundStacks"), stacksCount)
+		cmdr.Info.Printfln(apx.Trans("stacks.list.info.foundStacks"), stacksCount)
 
 		table := core.CreateApxTable(os.Stdout)
 		table.SetHeader([]string{apx.Trans("stacks.labels.name"), "Base", apx.Trans("stacks.labels.builtIn"), "Pkgs", "Pkg manager"})
@@ -284,14 +284,14 @@ func showStack(cmd *cobra.Command, args []string) error {
 }
 
 func newStack(cmd *cobra.Command, args []string) error {
-	assumeYes, _ := cmd.Flags().GetBool("assume-yes")
+	noPrompt, _ := cmd.Flags().GetBool("no-prompt")
 	name, _ := cmd.Flags().GetString("name")
 	base, _ := cmd.Flags().GetString("base")
 	packages, _ := cmd.Flags().GetString("packages")
 	pkgManager, _ := cmd.Flags().GetString("pkg-manager")
 
 	if name == "" {
-		if !assumeYes {
+		if !noPrompt {
 			cmdr.Info.Println(apx.Trans("stacks.new.info.askName"))
 			fmt.Scanln(&name)
 			if name == "" {
@@ -306,12 +306,12 @@ func newStack(cmd *cobra.Command, args []string) error {
 
 	ok := core.StackExists(name)
 	if ok {
-		cmdr.Error.Println(apx.Trans("stacks.new.error.alreadyExists"))
+		cmdr.Error.Printfln(apx.Trans("stacks.new.error.alreadyExists"), name)
 		return nil
 	}
 
 	if base == "" {
-		if !assumeYes {
+		if !noPrompt {
 			cmdr.Info.Println(apx.Trans("stacks.new.info.askBase"))
 			fmt.Scanln(&base)
 			if base == "" {
@@ -339,12 +339,12 @@ func newStack(cmd *cobra.Command, args []string) error {
 		var pkgManagerIndex int
 		_, err := fmt.Scanln(&pkgManagerIndex)
 		if err != nil {
-			cmdr.Error.Println(apx.Trans("apx.error.invalidInput"))
+			cmdr.Error.Println(apx.Trans("apx.errors.invalidInput"))
 			return nil
 		}
 
 		if pkgManagerIndex < 1 || pkgManagerIndex > len(pkgManagers) {
-			cmdr.Error.Println(apx.Trans("apx.error.invalidInput"))
+			cmdr.Error.Println(apx.Trans("apx.errors.invalidInput"))
 			return nil
 		}
 
@@ -358,7 +358,7 @@ func newStack(cmd *cobra.Command, args []string) error {
 	}
 
 	packagesArray := strings.Fields(packages)
-	if len(packagesArray) == 0 && !assumeYes {
+	if len(packagesArray) == 0 && !noPrompt {
 		cmdr.Info.Println(apx.Trans("stacks.new.info.noPackages") + "[y/N]")
 		reader := bufio.NewReader(os.Stdin)
 		answer, _ := reader.ReadString('\n')
@@ -386,7 +386,7 @@ func newStack(cmd *cobra.Command, args []string) error {
 }
 
 func updateStack(cmd *cobra.Command, args []string) error {
-	assumeYes, _ := cmd.Flags().GetBool("assume-yes")
+	noPrompt, _ := cmd.Flags().GetBool("no-prompt")
 	name, _ := cmd.Flags().GetString("name")
 	base, _ := cmd.Flags().GetString("base")
 	packages, _ := cmd.Flags().GetString("packages")
@@ -407,8 +407,13 @@ func updateStack(cmd *cobra.Command, args []string) error {
 		return error
 	}
 
+	if stack.BuiltIn {
+		cmdr.Error.Println(apx.Trans("stacks.update.error.builtIn"))
+		os.Exit(126)
+	}
+
 	if base == "" {
-		if !assumeYes {
+		if !noPrompt {
 			cmdr.Info.Printfln(apx.Trans("stacks.update.info.askBase"), stack.Base)
 			fmt.Scanln(&base)
 			if base == "" {
@@ -421,7 +426,7 @@ func updateStack(cmd *cobra.Command, args []string) error {
 	}
 
 	if pkgManager == "" {
-		if !assumeYes {
+		if !noPrompt {
 			cmdr.Info.Printfln(apx.Trans("stacks.update.info.askPkgManager"), stack.PkgManager)
 			fmt.Scanln(&pkgManager)
 			if pkgManager == "" {
@@ -439,34 +444,31 @@ func updateStack(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	packagesArray := strings.Fields(packages)
-	if len(packages) == 0 && !assumeYes {
-		if len(stack.Packages) == 0 {
-			cmdr.Info.Println(apx.Trans("stacks.install.info.noPackages") + "[y/N]")
-		} else {
-			cmdr.Info.Println(apx.Trans("stacks.update.info.confirmPackages"), strings.Join(stack.Packages, "\n\t - "))
-		}
 
+	if len(packages) > 0 {
+		stack.Packages = strings.Fields(packages)
+	} else if !noPrompt {
+		if len(stack.Packages) > 0 {
+			cmdr.Info.Println(apx.Trans("stacks.update.info.confirmPackages") + "[y/N]"  + "\n\t -", strings.Join(stack.Packages, "\n\t - "))
+		} else {
+			cmdr.Info.Println(apx.Trans("stacks.update.info.noPackages") + "[y/N]")
+		}
 		reader := bufio.NewReader(os.Stdin)
 		answer, _ := reader.ReadString('\n')
 		answer = strings.TrimSpace(answer)
 
+		packagesArray := []string{}
+
 		if answer == "y" || answer == "Y" {
-			if len(stack.Packages) > 0 {
-				packagesArray = stack.Packages
-			} else {
-				cmdr.Info.Println(apx.Trans("stacks.update.info.askPackages"))
-				packagesInput, _ := reader.ReadString('\n')
-				packagesInput = strings.TrimSpace(packagesInput)
-				packagesArray = strings.Fields(packagesInput)
-			}
-		} else {
-			packagesArray = []string{}
+			cmdr.Info.Println(apx.Trans("stacks.update.info.askPackages"))
+			packagesInput, _ := reader.ReadString('\n')
+			packagesInput = strings.TrimSpace(packagesInput)
+			packagesArray = strings.Fields(packagesInput)
+			stack.Packages = packagesArray
 		}
 	}
 
 	stack.Base = base
-	stack.Packages = packagesArray
 	stack.PkgManager = pkgManager
 
 	err := stack.Save()
@@ -483,6 +485,23 @@ func removeStack(cmd *cobra.Command, args []string) error {
 	stackName, _ := cmd.Flags().GetString("name")
 	if stackName == "" {
 		cmdr.Error.Println(apx.Trans("stacks.rm.error.noName"))
+		return nil
+	}
+
+	subSystems, _ := core.ListSubsystemForStack(stackName)
+	if len(subSystems) > 0 {
+		cmdr.Error.Printfln(apx.Trans("stacks.rm.error.inUse"), len(subSystems))
+		table := core.CreateApxTable(os.Stdout)
+		table.SetHeader([]string{apx.Trans("subsystems.labels.name"), "Stack", apx.Trans("subsystems.labels.status"), "Pkgs"})
+		for _, subSystem := range subSystems {
+			table.Append([]string{
+				subSystem.Name,
+				subSystem.Stack.Name,
+				subSystem.Status,
+				fmt.Sprintf("%d", len(subSystem.Stack.Packages)),
+			})
+		}
+		table.Render()
 		return nil
 	}
 

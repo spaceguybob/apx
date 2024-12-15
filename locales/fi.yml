@@ -1,25 +1,25 @@
 apx:
-  description: "Apx is a package manager with support for multiple sources, allowing
-    you to install packages in subsystems."
+  description: "Apx on pakettimanageri, joka tukee useita lähteitä ja mahdollistaa
+    pakettien asentamisen eri alijärjestelmiin."
   errors:
-    unknownCommand: "Unknown command: %s"
-    invalidInput: "Invalid input."
-    invalidChoice: "Invalid choice."
-    noRoot: "Do not run Apx as root."
+    unknownCommand: "Tuntematon komento: %s"
+    invalidInput: "Epäkelpo syöte."
+    invalidChoice: "Epäkelpo valinta."
+    noRoot: "Älä käytä Apx:ää root-käyttäjänä."
   msg:
-    help: "Show help for apx."
-    version: "Show version for apx."
-    usage: "Usage"
-    aliases: "Aliases"
-    examples: "Examples"
-    availableCommands: "Available Commands"
-    additionalCommands: "Additional Commands"
-    flags: "Flags"
-    globalFlags: "Global Flags"
-    additionalHelpTopics: "Additional help topics"
-    moreInfo: "Use %s for more information about a command"
+    help: "Näytä apx ohjeet."
+    version: "Näytä apx versio."
+    usage: "Käyttö"
+    aliases: "Aliakset"
+    examples: "Esimerkit"
+    availableCommands: "Mahdolliset komennot"
+    additionalCommands: "Lisäkomennot"
+    flags: "Parametrit"
+    globalFlags: "Globaalit parametrit"
+    additionalHelpTopics: "Lisäohjeita"
+    moreInfo: "Käytä %s saadaksesi lisätietoja komennosta"
   info:
-    aborting: "Aborting as requested."
+    aborting: "Keskeytetään pyynnöstä."
   terminal:
     yes: "yes"
     no: "no"
@@ -48,10 +48,10 @@ runtimeCommand:
     exportedBin: "Exported binary %s"
     unexportedApp: "Unexported application %s"
     unexportedBin: "Unexported binary %s"
-    startingContainer: "Starting subsystem %s…"
-    startedContainer: "Started subsystem."
-    stoppingContainer: "Stopping subsystem %s…"
-    stoppedContainer: "Stopped subsystem."
+    startingContainer: "Starting container…"
+    startedContainer: "Started container."
+    stoppingContainer: "Stopping container…"
+    stoppedContainer: "Stopped container."
   autoremove:
     description: "Remove packages that are no longer required."
   clean:
@@ -80,7 +80,7 @@ runtimeCommand:
   enter:
     description: "Enter the subsystem's environment."
   export:
-    description: "Export an application or binary from the subsystem to the host."
+    description: "Vie sovellus tai binääri alijärjestelmästä isäntäjärjestelmään."
     options:
       appName:
         description: "The name of the application to export."
@@ -89,7 +89,7 @@ runtimeCommand:
       binOutput:
         description: "Path of the binary output (default: ~/.local/bin/)."
   unexport:
-    description: "Unexport an application or binary from the host."
+    description: "Poista jo viety sovellus tai binääri isäntäjärjestelmästä."
     options:
       appName:
         description: "The name of the application to unexport."
@@ -131,12 +131,12 @@ pkgmanagers:
       askName: "Choose a name:"
       askSudo: "Does the package manager need sudo to run?"
       askCommand: "Enter the command for '%s':"
-      askCommandWithDefault: "Enter the command for '%s' (default: '%s'):"
       askOverwrite: "A package manager with the name '%s' already exists. Overwrite
         it?"
+      askCommandWithDefault: "Enter the command for '%s' (default: '%s'):"
     options:
       noPrompt:
-        description: "Assume defaults to all prompts."
+        description: "Assume yes to all prompts."
       name:
         description: "The name of the package manager."
       needSudo:
@@ -169,7 +169,7 @@ pkgmanagers:
     error:
       noName: "No name specified."
       missingCommand: "Missing command for %s."
-      builtIn: "Built-in package managers cannot be modified."
+      builtIn: Built-in package managers cannot be modified.
   rm:
     description: "Remove the specified package manager."
     error:
@@ -233,56 +233,57 @@ stacks:
       noBase: "No base specified."
       emptyPkgManager: "The package manager cannot be empty."
       noPkgManager: "No package manager specified."
-      noPkgManagers: "Could not find any package managers. Create
-        one with 'apx pkgmanagers new' or contact the system administrator."
-      pkgManagerDoesNotExist: "The specified package manager does not exist. Create
-        it with 'apx pkgmanagers new' or contact the system administrator."
-      emptyPackages: "The packages cannot be empty."
-      noPackages: "No packages specified."
-      alreadyExists: "A stack with the name '%s' already exists."
+      noPkgManagers: "Pakettimanagereja ei löydetty. Luo uusi komennolla 'apx pkgmanagers
+        new' tai ota yhteyttä järjestelmänvalvojaan."
+      pkgManagerDoesNotExist: "Määritettyä pakettimanageria ei ole olemassa. Luo uusi
+        komennolla 'apx pkgmanagers new' tai ota yhteyttä järjestelmänvalvojaan."
+      emptyPackages: "Sinun täytyy määrittää asennettavat paketit."
+      noPackages: "Paketteja ei määritettynä."
+      alreadyExists: "Pino nimeltään '%s' on jo olemassa."
     info:
-      askName: "Choose a name:"
-      askBase: "Choose a base (e.g. 'vanillaos/pico'):"
-      askPkgManager: "Choose a package manager:"
-      selectPkgManager: "Select a package manager [1-%d]:"
-      noPackages: "You have not provided any packages to install in the stack. Do you
-        want to add some now?"
-      confirmPackages: "Do you want to confirm the current packages list?"
-      askPackages: "Please type the packages you want to install in the stack, separated
-        by a space:"
-      success: "Created stack '%s'."
+      askName: "Valitse nimi:"
+      askBase: "Valitse pohja (esim. 'vanillaos/pico'):"
+      askPkgManager: "Valitse pakettimanageri:"
+      selectPkgManager: "Valitse pakettimanageri [1-%d]:"
+      noPackages: "Et ole valinnut paketteja asennettavaksi pinoon. Haluatko valita
+        ne nyt?"
+      confirmPackages: "Haluatko vahvistaa nykyisen pakettiluettelon?"
+      askPackages: "Määritä paketit jotka haluat asennettavan pinoon. Erota paketit
+        välilyönneillä."
+      success: "Luotiin pino '%s'."
     options:
       noPrompt:
-        description: "Assume defaults to all prompts."
+        description: "Vastaa kyllä kaikkiin kehotteisiin."
       name:
-        description: "The name of the stack."
+        description: "Pinon nimi."
       base:
-        description: "The base distribution image to use. (For a list of compatible images view: https://distrobox.it/compatibility/#containers-distros)"
+        description: "Käytettävä pohjadistribuution levykuva. (Lista yhteensopisivista
+          levykuvista: https://distrobox.it/compatibility/#containers-distros)"
       packages:
-        description: "The packages to install."
+        description: "Asennettavat paketit."
       pkgManager:
-        description: "The package manager to use."
+        description: "Käytettävä pakettimanageri."
   update:
-    description: "Update the specified stack."
+    description: "Päivitä määritetty pino."
     error:
-      noName: "No name specified."
-      noBase: "No base specified."
-      noPkgManager: "No package manager specified."
-      pkgManagerDoesNotExist: "The specified package manager does not exist. Create
-        it with 'apx pkgmanagers new' or contact the system administrator."
-      builtIn: "Built-in stacks cannot be modified."
+      noName: "Nimeä ei määritetty."
+      noBase: "Pohjaa ei määritetty."
+      noPkgManager: "Pakettimanageria ei määritetty."
+      pkgManagerDoesNotExist: "Määritettyä pakettimanageria ei ole olemassa. Luo uusi
+        komennolla 'apx pkgmanagers new' tai ota yhteyttä järjestelmänvalvojaan."
+      builtIn: Built-in stacks cannot be modified.
     info:
-      askBase: "Type a new base or confirm the current one (%s):"
-      askPkgManager: "Choose a new package manager or confirm the current one (%s):"
-      confirmPackages: "Do you want to update the list of packages?"
-      noPackages: "You have not provided any packages to install in the stack. Do you
-        want to add some now?"
-      askPackages: "Type the packages you want to install in the stack, separated
-        by a space:"
+      askBase: "Syötä uusi pohja tai vahvista nykyinen (%s):"
+      askPkgManager: "Valitse uusi pakettimanageri tai vahvista nykyinen (%s):"
+      confirmPackages: "Haluatko vahvistaa nykyisen pakettiluettelon?"
+      noPackages: "Et ole valinnut paketteja asennettavaksi pinoon. Haluatko valita
+        ne nyt?"
+      askPackages: "Syötä pinoon asennettavat paketit välilyönnillä erotettuina tai
+        vahvista nykyiset (%s):"
       success: "Updated stack '%s'."
     options:
       noPrompt:
-        description: "Assume defaults to all prompts."
+        description: "Assume yes to all prompts."
       name:
         description: "The name of the stack."
       base:
@@ -295,7 +296,7 @@ stacks:
     description: "Remove the specified stack."
     error:
       noName: "No name specified."
-      inUse: "The stack is used in %d subsystems:"
+      inUse: 'The stack is used in %d subsystems:'
     info:
       askConfirmation: "Are you sure you want to remove '%s'?"
       success: "Removed stack '%s'."
@@ -349,7 +350,6 @@ subsystems:
       noStacks: "A stack is needed to create a subsystem. Create a new one with 'apx
         stacks new' or contact the system administrator."
       emptyName: "The name cannot be empty."
-      forbiddenName: "The name '%s' is forbidden. Please choose a different name"
       noName: "No name specified."
       emptyStack: "The stack cannot be empty."
       noStack: "No stack specified."
