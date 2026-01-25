@@ -10,7 +10,6 @@ package settings
 */
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -37,10 +36,10 @@ type Config struct {
 func GetApxDefaultConfig() (*Config, error) {
 	config, err := conf.NewBuilder[Config]("apx").
 		WithType("json").
+		WithOptional(true).
 		Build()
 	if err != nil {
-		fmt.Printf("Unable to read config file: \n\t%s\n", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	distroboxPath := config.DistroboxPath
